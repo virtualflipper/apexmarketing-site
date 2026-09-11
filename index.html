@@ -23,7 +23,17 @@
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":["ProfessionalService","LocalBusiness"],"name":"Apex Marketing","legalName":"אפקס מרקטינג","vatID":"206666463","description":"מחלקת השיווק המלאה של סוכנויות רכב, יבואני רכב ורכבי יוקרה. שיווק דיגיטלי, ניהול סושיאל, צילום ווידאו רכב, קריאייטיב ומדיה ממומנת.","url":"https://apexmarketing.co.il/","telephone":"+972-52-4030370","email":"bar@apexmarketing.co.il","image":"https://apexmarketing.co.il/assets/og-v2.png","priceRange":"₪₪","areaServed":{"@type":"Country","name":"IL"},"address":{"@type":"PostalAddress","addressCountry":"IL"},"knowsAbout":["שיווק לסוכנויות רכב","שיווק ייבוא רכב","פרסום רכבי יוקרה","ניהול סושיאל לרכב","צילום רכב מקצועי","מדיה ממומנת"],"serviceType":["שיווק דיגיטלי לסוכנויות רכב","ניהול רשתות חברתיות","צילום ווידאו רכב","קמפיינים ממומנים","שיווק רכבי יוקרה","שיווק ייבוא רכב"],"sameAs":["https://instagram.com/barshushan7"]}
+{"@context":"https://schema.org","@type":["ProfessionalService","LocalBusiness"],
+"name":"Apex Marketing","legalName":"אפקס מרקטינג","vatID":"206666463",
+"description":"מחלקת השיווק המלאה של סוכנויות רכב, יבואני רכב ורכבי יוקרה. שיווק דיגיטלי, ניהול סושיאל, צילום ווידאו רכב, קריאייטיב ומדיה ממומנת.",
+"url":"https://apexmarketing.co.il/","telephone":"+972-52-4030370","email":"bar@apexmarketing.co.il",
+"image":"https://apexmarketing.co.il/assets/og-v2.png","priceRange":"₪₪",
+"areaServed":{"@type":"Country","name":"IL"},
+"address":{"@type":"PostalAddress","addressCountry":"IL"},
+"knowsAbout":["שיווק לסוכנויות רכב","שיווק ייבוא רכב","פרסום רכבי יוקרה","ניהול סושיאל לרכב","צילום רכב מקצועי","מדיה ממומנת"],
+"serviceType":["שיווק דיגיטלי לסוכנויות רכב","ניהול רשתות חברתיות","צילום ווידאו רכב","קמפיינים ממומנים","שיווק רכבי יוקרה","שיווק ייבוא רכב"],
+"founder":{"@type":"Person","name":"בר שושן","alternateName":"Bar Shushan","jobTitle":"מייסד Apex Marketing","url":"https://apexmarketing.co.il/בר-שושן","sameAs":["https://www.instagram.com/barshushan7/","https://www.linkedin.com/in/bar-shushan-073318213/","https://www.youtube.com/user/barshushan203"]},
+"sameAs":["https://www.instagram.com/barshushan7/","https://www.linkedin.com/in/bar-shushan-073318213/","https://www.youtube.com/user/barshushan203"]}
 </script>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
@@ -70,18 +80,14 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;o
 .work:focus-visible .media{border-color:var(--blue-lt)}
 .rail:focus-visible{outline:3px solid var(--blue-lt);outline-offset:-3px}
 .lang{background:transparent;border:1px solid var(--line);color:var(--paper);cursor:pointer;
-  width:44px;height:44px;padding:0;display:inline-grid;place-items:center;position:relative;
-  transition:border-color .3s,background .3s,color .3s,transform .3s cubic-bezier(.2,.8,.2,1)}
-.lang:hover{border-color:var(--blue);background:rgba(6,109,234,.12);color:var(--blue-lt);transform:translateY(-2px)}
-.lang svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.4;
-  stroke-linecap:round;transition:transform .6s cubic-bezier(.2,.8,.2,1)}
-.lang:hover svg{transform:rotate(-18deg)}
-.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
-  clip:rect(0 0 0 0);white-space:nowrap;border:0}
+  font-family:var(--f-mono);font-size:12px;letter-spacing:.14em;padding:10px 13px;direction:ltr;
+  display:inline-flex;align-items:center;gap:7px;transition:border-color .3s,background .3s,color .3s}
+.lang:hover{border-color:var(--blue);background:rgba(6,109,234,.12);color:var(--blue-lt)}
+.lang svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.7}
 .foot-links{display:flex;gap:16px;flex-wrap:wrap;align-items:center}
 .foot-links a{color:var(--muted);text-decoration:none;border-bottom:1px solid transparent;transition:color .25s,border-color .25s}
 .foot-links a:hover{color:var(--paper);border-bottom-color:var(--blue)}
-[dir="ltr"] .svc:hover h4,[dir="ltr"] .svc.lit h4{transform:translateX(6px)}
+[dir="ltr"] .svc:hover h4{transform:translateX(6px)}
 [dir="ltr"] .svc::after,[dir="ltr"] .col.hot::before{transform-origin:left}
 [dir="ltr"] .tick-row{animation-name:slideL}
 @keyframes slideL{to{transform:translateX(-50%)}}
@@ -100,6 +106,16 @@ nav.stuck{background:rgba(8,9,12,.87);border-bottom-color:var(--line)}
 .nav-links a{color:var(--muted);text-decoration:none;font-size:14px;transition:color .25s;position:relative}
 .nav-links a::after{content:'';position:absolute;bottom:-5px;right:0;width:0;height:1px;background:var(--blue);transition:width .3s}
 .nav-links a:hover{color:var(--paper)} .nav-links a:hover::after{width:100%}
+.has-drop{position:relative;display:inline-flex;align-items:center}
+.drop-t{color:var(--muted);background:none;border:none;cursor:pointer;font-family:var(--f-body);font-weight:300;font-size:14px;transition:color .25s;position:relative;padding:0;display:inline-flex;align-items:center;gap:5px}
+.drop-t::after{content:'';position:absolute;bottom:-5px;right:0;width:0;height:1px;background:var(--blue);transition:width .3s}
+.has-drop:hover .drop-t{color:var(--paper)} .has-drop:hover .drop-t::after{width:100%}
+.drop{position:absolute;top:calc(100% + 12px);right:0;background:rgba(8,9,12,.97);border:1px solid var(--line);min-width:250px;
+  display:flex;flex-direction:column;opacity:0;visibility:hidden;transform:translateY(-6px);transition:opacity .25s,transform .25s,visibility .25s;padding:8px 0;backdrop-filter:blur(16px);box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.has-drop:hover .drop,.has-drop:focus-within .drop{opacity:1;visibility:visible;transform:none}
+.drop a{padding:11px 20px;font-size:13.5px;color:var(--muted);text-decoration:none;transition:color .2s,background .2s;white-space:nowrap}
+.drop a::after{display:none}
+.drop a:hover{color:var(--paper);background:rgba(6,109,234,.12)}
 @media(max-width:940px){.nav-links{display:none}}
 .btn{display:inline-flex;align-items:center;gap:10px;background:var(--blue);color:#fff;text-decoration:none;
   padding:12px 24px;font-size:14px;font-weight:600;border:none;cursor:pointer;position:relative;overflow:hidden;
@@ -109,44 +125,19 @@ nav.stuck{background:rgba(8,9,12,.87);border-bottom-color:var(--line)}
   transition:transform .38s cubic-bezier(.2,.8,.2,1);z-index:1}
 .btn:hover::before{transform:translateY(0)} .btn:hover span{color:var(--ink)}
 .btn:hover{transform:translateY(-2px);box-shadow:0 12px 34px rgba(6,109,234,.3)}
-.btn-ghost{background:rgba(30,34,42,.92);border:1px solid #3A4150;backdrop-filter:blur(8px)} .btn-ghost::before{background:var(--paper)}
+.btn-ghost{background:transparent;border:1px solid var(--line)} .btn-ghost::before{background:var(--paper)}
 
 /* HERO */
 header{min-height:100svh;display:flex;align-items:center;position:relative;padding-top:120px;padding-bottom:80px;overflow:hidden}
-.hero-photo{position:absolute;inset:0;z-index:0;pointer-events:none;
-  opacity:0;animation:heroIn 1.1s ease-out .1s forwards}
-@keyframes heroIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-.hero-photo img{width:100%;height:100%;object-fit:cover;object-position:34% 56%;
-  filter:saturate(.62) brightness(.52) contrast(1.05);
-  animation:heroDrift 26s ease-in-out infinite alternate}
-@keyframes heroDrift{from{transform:scale(1.1) translateX(2.4%)}to{transform:scale(1.1) translateX(-2.4%)}}
-.hero-photo::after{content:'';position:absolute;inset:0;
-  background:linear-gradient(90deg,rgba(8,9,12,.55) 0%,rgba(8,9,12,.82) 55%,rgba(8,9,12,.97) 100%),
-             linear-gradient(0deg,var(--ink) 0%,rgba(8,9,12,.25) 30%,rgba(8,9,12,.55) 100%)}
-[dir="ltr"] .hero-photo::after{background:linear-gradient(270deg,rgba(8,9,12,.55) 0%,rgba(8,9,12,.82) 55%,rgba(8,9,12,.97) 100%),
-             linear-gradient(0deg,var(--ink) 0%,rgba(8,9,12,.25) 30%,rgba(8,9,12,.55) 100%)}
-html.a11y-contrast .hero-photo{display:none}
-@media(max-width:1000px){
-  /* dedicated full-bleed 9:16 asset: fills the whole hero, car already placed
-     behind the headline, so cover never crops it */
-  .hero-photo img{object-fit:cover;object-position:50% 50%;
-    filter:saturate(.7) brightness(.55) contrast(1.04);opacity:.85;
-    animation:heroDriftM 34s ease-in-out infinite alternate}
-  .hero-photo::after,[dir="ltr"] .hero-photo::after{
-    background:linear-gradient(0deg,var(--ink) 0%,rgba(8,9,12,.62) 12%,rgba(8,9,12,.42) 42%,rgba(8,9,12,.5) 72%,rgba(8,9,12,.8) 100%)}
-  .grid-bg{opacity:.1}
-  .glow{opacity:.4}
-}
-@keyframes heroDriftM{from{transform:scale(1.12) translateX(3%)}to{transform:scale(1.12) translateX(-3%)}}
-.grid-bg{position:absolute;inset:0;z-index:1;opacity:.2;
+.grid-bg{position:absolute;inset:0;z-index:0;opacity:.42;
   background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
   background-size:80px 80px;
   mask-image:radial-gradient(ellipse 85% 75% at 30% 45%,#000 0%,transparent 70%);
   -webkit-mask-image:radial-gradient(ellipse 85% 75% at 30% 45%,#000 0%,transparent 70%)}
-.glow{position:absolute;width:60vw;height:60vw;left:-12vw;top:8vw;z-index:1;pointer-events:none;
+.glow{position:absolute;width:60vw;height:60vw;left:-12vw;top:8vw;z-index:0;pointer-events:none;
   background:radial-gradient(circle,rgba(6,109,234,.16),transparent 62%);animation:breathe 7s ease-in-out infinite}
 @keyframes breathe{0%,100%{opacity:.65;transform:scale(1)}50%{opacity:1;transform:scale(1.12)}}
-.speeds{position:absolute;inset:0;z-index:1;overflow:hidden;pointer-events:none}
+.speeds{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none}
 .speeds i{position:absolute;height:1px;right:-40%;background:linear-gradient(270deg,transparent,var(--blue-lt),transparent);opacity:0;animation:zip linear infinite}
 @keyframes zip{0%{transform:translateX(0);opacity:0}8%{opacity:.55}70%{opacity:.35}100%{transform:translateX(-165vw);opacity:0}}
 .hero-grid{position:relative;z-index:3;width:100%;display:grid;grid-template-columns:1.02fr .98fr;gap:clamp(30px,4vw,70px);align-items:center}
@@ -171,7 +162,6 @@ h1 em{font-style:normal;color:var(--blue-lt)}
 @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
 .hero-cta{display:flex;gap:13px;flex-wrap:wrap;opacity:0;animation:fadeUp .9s .66s cubic-bezier(.2,.8,.2,1) forwards}
 .circuit{width:100%;height:auto;overflow:visible;opacity:0;animation:fadeUp 1s .3s ease forwards}
-.trk-road{opacity:.5}
 .trk-base{fill:none;stroke:#161B24;stroke-width:52;stroke-linecap:round;stroke-linejoin:round}
 .trk-edge{fill:none;stroke:#232A36;stroke-width:54;stroke-linecap:round;opacity:.9}
 .trk-dash{fill:none;stroke:#5C6577;stroke-width:2.5;stroke-dasharray:16 30;animation:flow 1.6s linear infinite}
@@ -252,12 +242,12 @@ h2 em{font-style:normal;color:var(--blue-lt)}
 .svc::before{content:'';position:absolute;top:-60%;right:-30%;width:60%;height:220%;
   background:linear-gradient(90deg,transparent,rgba(6,109,234,.13),transparent);
   transform:translateX(120%) rotate(12deg);transition:transform .8s cubic-bezier(.2,.8,.2,1)}
-.svc:hover,.svc.lit{background:var(--ink-3)} .svc:hover::after,.svc.lit::after{transform:scaleX(1)}
-.svc:hover::before,.svc.lit::before{transform:translateX(-220%) rotate(12deg)}
+.svc:hover{background:var(--ink-3)} .svc:hover::after{transform:scaleX(1)}
+.svc:hover::before{transform:translateX(-220%) rotate(12deg)}
 .svc-n{font-family:var(--f-mono);font-size:10.5px;color:var(--muted);letter-spacing:.18em;direction:ltr;margin-bottom:auto;transition:color .3s}
-.svc:hover .svc-n,.svc.lit .svc-n{color:var(--blue-lt)}
+.svc:hover .svc-n{color:var(--blue-lt)}
 .svc h4{font-family:var(--f-display);font-weight:400;font-size:clamp(23px,2.2vw,33px);line-height:1.05;margin:32px 0 11px;position:relative;z-index:2;transition:transform .45s cubic-bezier(.2,.8,.2,1)}
-.svc:hover h4,.svc.lit h4{transform:translateX(-6px)}
+.svc:hover h4{transform:translateX(-6px)}
 .svc p{font-size:14.2px;color:#828A99;line-height:1.65;position:relative;z-index:2}
 @media(max-width:960px){.svc-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:600px){.svc-grid{grid-template-columns:1fr}.svc{min-height:auto}}
@@ -342,25 +332,21 @@ h2 em{font-style:normal;color:var(--blue-lt)}
 .clients{background:var(--ink-2);border-block:1px solid var(--line)}
 .logo-wall{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--line);border-right:1px solid var(--line);margin-top:18px}
 .logo-cell{border-bottom:1px solid var(--line);border-left:1px solid var(--line);aspect-ratio:16/9;
-  display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;transition:background .4s;
+  display:flex;align-items:center;justify-content:center;padding:8% 12%;position:relative;overflow:hidden;transition:background .4s;
   text-decoration:none;color:inherit}
 a.logo-cell::after{content:'';position:absolute;top:9px;left:9px;width:13px;height:13px;z-index:3;opacity:0;transition:opacity .35s;
   background:no-repeat center/contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233E92FF' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M7 17 17 7M9 7h8v8'/%3E%3C/svg%3E")}
 a.logo-cell:hover::after{opacity:1}
 .logo-cell::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(6,109,234,.18),transparent 68%);opacity:0;transition:opacity .45s}
 .logo-cell:hover{background:var(--ink-3)} .logo-cell:hover::before{opacity:1}
-.logo-cell img{position:absolute;inset:14%;width:72%;height:72%;object-fit:contain;z-index:2;
+.logo-cell img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;position:relative;z-index:2;
   opacity:.62;transition:opacity .45s,transform .45s,filter .45s;filter:saturate(.55)}
 .logo-cell:hover img{opacity:1;transform:scale(1.06);filter:saturate(1)}
 .logo-cell .txt{font-family:var(--f-display);font-weight:400;font-size:clamp(17px,1.6vw,25px);color:#6C7484;
   text-align:center;line-height:1.05;position:relative;z-index:2;transition:color .35s,transform .35s}
 .logo-cell:hover .txt{color:var(--paper);transform:scale(1.04)}
 @media(max-width:1000px){.logo-wall{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:560px){
-  .logo-wall{grid-template-columns:repeat(2,1fr)}
-  .logo-cell{aspect-ratio:8/5}
-  .logo-cell img{inset:12%;width:76%;height:76%}
-}
+@media(max-width:560px){.logo-wall{grid-template-columns:repeat(2,1fr)}}
 .wall-note{margin-top:24px;font-family:var(--f-mono);font-size:11.5px;letter-spacing:.12em;color:var(--muted)}
 
 /* WORK RAIL */
@@ -431,6 +417,9 @@ a.logo-cell:hover::after{opacity:1}
 .c-row:hover .val{color:var(--blue-lt)}
 
 footer{border-top:1px solid var(--line);padding:30px 0}
+.foot-nav{max-width:var(--maxw);margin:0 auto 20px;padding-inline:var(--gutter);display:flex;gap:14px 30px;flex-wrap:wrap}
+.foot-nav a{color:var(--muted);text-decoration:none;font-size:13px;transition:color .25s}
+.foot-nav a:hover{color:var(--paper)}
 .foot-in{max-width:var(--maxw);margin:0 auto;padding-inline:var(--gutter);display:flex;justify-content:space-between;
   align-items:center;gap:18px;flex-wrap:wrap;font-family:var(--f-mono);font-size:10.5px;letter-spacing:.16em;color:var(--muted);direction:ltr}
 .foot-rights{max-width:var(--maxw);margin:20px auto 0;padding-inline:var(--gutter);padding-top:18px;
@@ -455,75 +444,7 @@ footer{border-top:1px solid var(--line);padding:30px 0}
   *{animation:none!important;transition:none!important}
   .reveal{opacity:1;transform:none} .rline{stroke-dashoffset:0}
   h1 .ln>i{transform:none} .hero-sub,.hero-cta,.circuit{opacity:1} .apexmark{opacity:1}
-  .hero-photo{opacity:1}
 }
-
-/* ===== accessibility panel ===== */
-.a11y-btn{position:fixed;bottom:22px;inset-inline-start:22px;z-index:1500;width:54px;height:54px;border-radius:50%;
-  background:var(--blue);border:none;cursor:pointer;display:grid;place-items:center;
-  box-shadow:0 10px 32px rgba(6,109,234,.4);transition:transform .3s cubic-bezier(.2,.8,.2,1)}
-.a11y-btn:hover{transform:scale(1.09)}
-.a11y-btn svg{width:29px;height:29px;fill:#fff}
-.a11y-panel{position:fixed;bottom:88px;inset-inline-start:22px;z-index:1600;width:min(310px,calc(100vw - 44px));
-  background:var(--ink);border:1px solid var(--line);box-shadow:0 24px 60px rgba(0,0,0,.6);
-  padding:16px;font-family:var(--f-body);max-height:min(76vh,600px);overflow-y:auto}
-.a11y-panel[hidden]{display:none}
-.a11y-head{display:flex;align-items:center;justify-content:space-between;gap:12px;
-  padding-bottom:12px;margin-bottom:12px;border-bottom:1px solid var(--line)}
-.a11y-head strong{font-family:var(--f-display);font-weight:400;font-size:26px;line-height:1;color:var(--paper)}
-.a11y-x{background:transparent;border:1px solid var(--line);color:var(--paper);width:30px;height:30px;
-  cursor:pointer;font-size:15px;line-height:1;display:grid;place-items:center;transition:.25s}
-.a11y-x:hover{border-color:var(--blue);color:var(--blue-lt)}
-.a11y-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;
-  font-size:14px;color:#B4BBC7}
-.a11y-steps{display:flex;align-items:center;gap:6px;direction:ltr}
-.a11y-steps button{width:34px;height:34px;background:transparent;border:1px solid var(--line);
-  color:var(--paper);cursor:pointer;font-family:var(--f-mono);font-size:13px;transition:.25s}
-.a11y-steps button:hover{border-color:var(--blue);background:rgba(6,109,234,.14);color:var(--blue-lt)}
-.a11y-steps span{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);min-width:44px;text-align:center}
-.a11y-opt{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;
-  background:transparent;border:1px solid var(--line);color:#B4BBC7;cursor:pointer;
-  padding:11px 13px;margin-bottom:7px;font-family:var(--f-body);font-size:14px;text-align:start;transition:.25s}
-.a11y-opt:hover{border-color:var(--blue);color:var(--paper)}
-.a11y-opt::after{content:'';width:34px;height:18px;flex:none;border-radius:9px;background:#20242D;
-  border:1px solid var(--line);position:relative;transition:background .25s}
-.a11y-opt[aria-pressed="true"]{border-color:var(--blue);color:var(--paper);background:rgba(6,109,234,.1)}
-.a11y-opt[aria-pressed="true"]::after{background:var(--blue);border-color:var(--blue)}
-.a11y-knob{position:absolute;top:50%;inset-inline-start:36px;width:0;height:0}
-.a11y-opt::before{content:'';position:absolute;width:12px;height:12px;border-radius:50%;background:#6E7788;
-  margin-inline-start:-29px;transition:transform .25s,background .25s;transform:translateX(0);align-self:center;order:2}
-[dir="rtl"] .a11y-opt::before{margin-inline-start:0;margin-inline-end:-29px}
-.a11y-opt[aria-pressed="true"]::before{background:#fff;transform:translateX(var(--knob,14px))}
-[dir="rtl"] .a11y-opt[aria-pressed="true"]::before{transform:translateX(calc(var(--knob,14px) * -1))}
-.a11y-reset{width:100%;background:var(--blue);border:none;color:#fff;cursor:pointer;padding:11px;
-  font-family:var(--f-body);font-weight:600;font-size:14px;margin-top:5px;transition:.25s}
-.a11y-reset:hover{filter:brightness(1.15)}
-.a11y-link{display:block;margin-top:11px;font-size:13px;color:var(--blue-lt);text-align:center;text-decoration:none}
-.a11y-link:hover{text-decoration:underline}
-
-/* --- applied states --- */
-html.a11y-zoom main,html.a11y-zoom footer{zoom:var(--a11y-zoom,1)}
-html.a11y-contrast{--muted:#FFFFFF;--paper:#FFFFFF;--ink:#000000;--ink-2:#000000;--ink-3:#0A0A0A;--line:#FFFFFF}
-html.a11y-contrast body{background:#000}
-html.a11y-contrast p,html.a11y-contrast li,html.a11y-contrast .sec-lead,html.a11y-contrast .svc p,
-html.a11y-contrast .wt,html.a11y-contrast .stat .k,html.a11y-contrast .col li,html.a11y-contrast .foot-rights p,
-html.a11y-contrast .cl-foot,html.a11y-contrast figcaption{color:#FFF !important}
-html.a11y-contrast .grid-bg,html.a11y-contrast .glow,html.a11y-contrast .speeds,
-html.a11y-contrast .veil,html.a11y-contrast .scan,html.a11y-contrast .svc::before{display:none !important}
-html.a11y-contrast img{filter:none !important;opacity:1 !important}
-html.a11y-contrast a{color:#FFEB3B !important}
-html.a11y-contrast .btn,html.a11y-contrast .a11y-reset{background:#FFEB3B;color:#000}
-html.a11y-contrast .btn span{color:#000}
-html.a11y-links a,html.a11y-links button{text-decoration:underline !important;outline:1px dashed currentColor;outline-offset:2px}
-html.a11y-nomotion *,html.a11y-nomotion *::before,html.a11y-nomotion *::after{
-  animation:none !important;transition:none !important;scroll-behavior:auto !important}
-html.a11y-readable body,html.a11y-readable h1,html.a11y-readable h2,html.a11y-readable h3,
-html.a11y-readable h4,html.a11y-readable .big-cta,html.a11y-readable .stat .v,
-html.a11y-readable .a11y-head strong,html.a11y-readable .tick-row span{
-  font-family:Arial,'Assistant',sans-serif !important;letter-spacing:.01em !important}
-html.a11y-spacing p,html.a11y-spacing li,html.a11y-spacing .sec-lead,html.a11y-spacing .svc p,
-html.a11y-spacing .wt,html.a11y-spacing .stat .k{line-height:2.1 !important;letter-spacing:.03em !important}
-
 </style>
 </head>
 <body>
@@ -538,17 +459,24 @@ html.a11y-spacing .wt,html.a11y-spacing .stat .k{line-height:2.1 !important;lett
       <span>APEX MARKETING</span>
     </a>
     <div class="nav-links">
-      <a href="#pitch"><span data-i18n="nav1">הגישה</span></a><a href="#services"><span data-i18n="nav2">שירותים</span></a><a href="#edge"><span data-i18n="nav3">למה אנחנו</span></a><a href="#racing"><span data-i18n="nav4">מסלול</span></a>
+      <a href="#pitch"><span data-i18n="nav1">הגישה</span></a>
+      <div class="has-drop">
+        <button class="drop-t" type="button" aria-haspopup="true"><span data-i18n="nav2">שירותים</span></button>
+        <div class="drop" role="menu">
+          <a href="/חברת-שיווק-לסוכנויות-רכב">שיווק לסוכנויות רכב</a>
+          <a href="/שיווק-ליבואני-רכב">שיווק ליבואני רכב</a>
+          <a href="/שיווק-לרכבי-יוקרה">שיווק לרכבי יוקרה</a>
+          <a href="/שיווק-דיגיטלי-לעולם-הרכב">שיווק דיגיטלי לעולם הרכב</a>
+        </div>
+      </div>
+      <a href="/אודות"><span data-i18n="navabout">אודות</span></a>
+      <a href="/בר-שושן"><span data-i18n="navbar">בר שושן</span></a>
       <a href="#clients"><span data-i18n="nav5">לקוחות</span></a><a href="#works"><span data-i18n="nav6">עבודות</span></a>
     </div>
     <div style="display:flex;align-items:center;gap:9px">
-      <button class="lang" id="langBtn" type="button" aria-label="Switch to English" title="English">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="12" cy="12" r="9.2"/>
-          <ellipse cx="12" cy="12" rx="4.1" ry="9.2"/>
-          <path d="M2.9 12h18.2"/><path d="M4.5 6.7h15"/><path d="M4.5 17.3h15"/>
-        </svg>
-        <span class="sr-only" id="langTxt">English</span>
+      <button class="lang" id="langBtn" type="button" aria-label="Switch to English">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18a15 15 0 0 1 0-18"/></svg>
+        <span id="langTxt">EN</span>
       </button>
       <a href="https://wa.me/972524030370" class="btn" target="_blank" rel="noopener"><span><span data-i18n="navcta">דברו איתנו</span></span></a>
     </div>
@@ -557,12 +485,6 @@ html.a11y-spacing .wt,html.a11y-spacing .stat .k{line-height:2.1 !important;lett
 
 <main id="main">
 <header id="top">
-  <div class="hero-photo" aria-hidden="true">
-    <picture>
-      <source media="(max-width:1000px)" srcset="assets/hero-yaris-m.webp">
-      <img src="assets/hero-yaris.webp" alt="" fetchpriority="high" decoding="async">
-    </picture>
-  </div>
   <div class="grid-bg"></div><div class="glow"></div><div class="speeds" id="speeds"></div>
   <div class="wrap hero-grid">
     <div>
@@ -582,11 +504,9 @@ html.a11y-spacing .wt,html.a11y-spacing .stat .k{line-height:2.1 !important;lett
       <defs><linearGradient id="tail" x1="0" y1="0" x2="1" y2="0">
         <stop offset="0%" stop-color="#3E92FF" stop-opacity="0"/><stop offset="100%" stop-color="#3E92FF" stop-opacity=".9"/>
       </linearGradient></defs>
-      <g class="trk-road">
       <path class="trk-edge" d="M 985 575 C 655 565, 375 495, 295 350 C 232 238, 470 105, 985 68"/>
       <path class="trk-base" d="M 985 575 C 655 565, 375 495, 295 350 C 232 238, 470 105, 985 68"/>
       <path class="trk-dash" d="M 985 575 C 655 565, 375 495, 295 350 C 232 238, 470 105, 985 68"/>
-      </g>
       <line class="tick" x1="700" y1="530" x2="700" y2="572"/>
       <line class="tick" x1="252" y1="330" x2="296" y2="312"/>
       <line class="tick" x1="700" y1="72" x2="700" y2="112"/>
@@ -691,7 +611,7 @@ html.a11y-spacing .wt,html.a11y-spacing .stat .k{line-height:2.1 !important;lett
           <div class="stat"><div class="v" data-count="15" data-suffix="+">0</div><div class="k"><span data-i18n="st1">מותגים בעולם הרכב תחת ניהול</span></div></div>
           <div class="stat"><div class="v">360°</div><div class="k"><span data-i18n="st2">מאסטרטגיה ועד פרסום, בלי ספקים באמצע</span></div></div>
           <div class="stat"><div class="v">1</div><div class="k"><span data-i18n="st3">איש קשר. אחריות אחת על הכל</span></div></div>
-          <div class="stat"><div class="v" data-count="5" data-suffix="+">0</div><div class="k"><span data-i18n="st4">שנים בתחום השיווק</span></div></div>
+          <div class="stat"><div class="v">EU</div><div class="k"><span data-i18n="st4">נהג ראלי פעיל שמתחרה באירופה</span></div></div>
         </div>
 
         <div class="cluster reveal" id="cluster">
@@ -744,7 +664,7 @@ html.a11y-spacing .wt,html.a11y-spacing .stat .k{line-height:2.1 !important;lett
     <span class="rh-tag">APEX ON THE CAR</span>
     <img src="assets/race-hero.webp" alt="פיג'ו 208 Rally4 בראלי וספרם, הונגריה" loading="lazy" decoding="async">
     <div class="rh-cap">
-      <span class="t"><span data-i18n="s4cap">גראבל, אבק, ולוגו שלנו על הכנף.</span></span>
+      <span class="t"><span data-i18n="s4cap">גראבל, אבק, ולוגו שלנו על המכסה.</span></span>
       <span class="s">31. VESZPRÉM RALLY · HUNGARY · PEUGEOT 208 RALLY4</span>
     </div>
   </div>
@@ -768,7 +688,7 @@ html.a11y-spacing .wt,html.a11y-spacing .stat .k{line-height:2.1 !important;lett
 <!-- 05 -->
 <section class="clients" id="clients">
   <div class="wrap">
-    <div class="sec-head reveal"><span class="sec-num">05 / CLIENTS</span><h2><span data-i18n="s5h">חלק מהלקוחות שלנו</span></h2></div>
+    <div class="sec-head reveal"><span class="sec-num">05 / CLIENTS</span><h2><span data-i18n="s5h">מי כבר עובד איתנו</span></h2></div>
     <div class="logo-wall reveal">
       <a class="logo-cell" href="https://instagram.com/golden_motors_il" target="_blank" rel="noopener" aria-label="Golden Motors באינסטגרם"><img loading="lazy" decoding="async" src="assets/logo-golden-motors.png" alt="Golden Motors"></a>
       <a class="logo-cell" href="https://instagram.com/golden_motors_workshop" target="_blank" rel="noopener" aria-label="Golden Motors Workshop באינסטגרם"><img loading="lazy" decoding="async" src="assets/logo-golden-workshop.png" alt="Golden Motors Workshop"></a>
@@ -781,6 +701,7 @@ html.a11y-spacing .wt,html.a11y-spacing .stat .k{line-height:2.1 !important;lett
       <a class="logo-cell" href="https://instagram.com/prodxil" target="_blank" rel="noopener" aria-label="PROD-X באינסטגרם"><img loading="lazy" decoding="async" src="assets/logo-prod-x.png" alt="PROD-X"></a>
       <a class="logo-cell" href="https://instagram.com/p1spec_israel" target="_blank" rel="noopener" aria-label="P1Spec Motorsports באינסטגרם"><img loading="lazy" decoding="async" src="assets/logo-p1spec.png" alt="P1Spec Motorsports"></a>
     </div>
+    <p class="wall-note reveal"><span data-i18n="s5note">וזה רק חלק מהם.</span></p>
   </div>
 </section>
 
@@ -905,13 +826,26 @@ html.a11y-spacing .wt,html.a11y-spacing .stat .k{line-height:2.1 !important;lett
   <div class="wrap">
     <div class="sec-head reveal"><span class="sec-num">07 / FAQ</span><h2>שאלות נפוצות</h2></div>
     <div class="reveal" style="border-top:1px solid var(--line);max-width:64rem">
-      <details style="border-bottom:1px solid var(--line);padding:20px 0"><summary style="cursor:pointer;font-family:var(--f-display);font-weight:400;font-size:clamp(20px,2.4vw,29px);color:var(--paper)">כמה עולה שיווק לסוכנות רכב?</summary><p style="color:#98A0AE;font-size:16px;line-height:1.85;margin-top:12px">העלות משתנה לפי היקף העבודה. באפקס המודל הוא מחלקת שיווק מלאה בעלות של משכורת אחת, במקום לגייס בנפרד מנהל שיווק, צלם ומנהל מדיה. המחיר המדויק נקבע לפי הצרכים של הסוכנות ונסגר מראש בכתב.</p></details>
-      <details style="border-bottom:1px solid var(--line);padding:20px 0"><summary style="cursor:pointer;font-family:var(--f-display);font-weight:400;font-size:clamp(20px,2.4vw,29px);color:var(--paper)">מה כולל שירות שיווק לעולם הרכב?</summary><p style="color:#98A0AE;font-size:16px;line-height:1.85;margin-top:12px">השירות כולל אסטרטגיה וניהול שיווק, צילום ווידאו של הרכבים, קריאייטיב וקופי, ניהול סושיאל, מדיה ממומנת, מיתוג, אוטומציות ודוחות ביצועים. הכול תחת קורת גג אחת ואיש קשר אחד.</p></details>
-      <details style="border-bottom:1px solid var(--line);padding:20px 0"><summary style="cursor:pointer;font-family:var(--f-display);font-weight:400;font-size:clamp(20px,2.4vw,29px);color:var(--paper)">איך בוחרים סוכנות שיווק לעולם הרכב?</summary><p style="color:#98A0AE;font-size:16px;line-height:1.85;margin-top:12px">כדאי לבחור גורם שמכיר את עולם הרכב מבפנים, מציג עבודות אמיתיות בתחום, נותן אחריות אחת על כל שרשרת השיווק ומודד תוצאות. ההיכרות עם קהל קוני הרכב חשובה לא פחות מהיכולת הטכנית.</p></details>
-      <details style="border-bottom:1px solid var(--line);padding:20px 0"><summary style="cursor:pointer;font-family:var(--f-display);font-weight:400;font-size:clamp(20px,2.4vw,29px);color:var(--paper)">תוך כמה זמן רואים תוצאות?</summary><p style="color:#98A0AE;font-size:16px;line-height:1.85;margin-top:12px">תוכן אורגני ונוכחות מתחילים לעבוד כבר מהשבועות הראשונים, ומדיה ממומנת יכולה להביא פניות תוך ימים. בניית מותג חזק היא תהליך מתמשך שמצטבר לאורך חודשים.</p></details>
+      <details style="border-bottom:1px solid var(--line);padding:20px 0">
+        <summary style="cursor:pointer;font-family:var(--f-display);font-weight:400;font-size:clamp(20px,2.4vw,29px);color:var(--paper)">כמה עולה שיווק לסוכנות רכב?</summary>
+        <p style="color:#98A0AE;font-size:16px;line-height:1.85;margin-top:12px">העלות משתנה לפי היקף העבודה. באפקס המודל הוא מחלקת שיווק מלאה בעלות של משכורת אחת, במקום לגייס בנפרד מנהל שיווק, צלם ומנהל מדיה. המחיר המדויק נקבע לפי הצרכים של הסוכנות ונסגר מראש בכתב.</p>
+      </details>
+      <details style="border-bottom:1px solid var(--line);padding:20px 0">
+        <summary style="cursor:pointer;font-family:var(--f-display);font-weight:400;font-size:clamp(20px,2.4vw,29px);color:var(--paper)">מה כולל שירות שיווק לעולם הרכב?</summary>
+        <p style="color:#98A0AE;font-size:16px;line-height:1.85;margin-top:12px">השירות כולל אסטרטגיה וניהול שיווק, צילום ווידאו של הרכבים, קריאייטיב וקופי, ניהול סושיאל, מדיה ממומנת, מיתוג, אוטומציות ודוחות ביצועים. הכול תחת קורת גג אחת ואיש קשר אחד.</p>
+      </details>
+      <details style="border-bottom:1px solid var(--line);padding:20px 0">
+        <summary style="cursor:pointer;font-family:var(--f-display);font-weight:400;font-size:clamp(20px,2.4vw,29px);color:var(--paper)">איך בוחרים סוכנות שיווק לעולם הרכב?</summary>
+        <p style="color:#98A0AE;font-size:16px;line-height:1.85;margin-top:12px">כדאי לבחור גורם שמכיר את עולם הרכב מבפנים, מציג עבודות אמיתיות בתחום, נותן אחריות אחת על כל שרשרת השיווק ומודד תוצאות. ההיכרות עם קהל קוני הרכב חשובה לא פחות מהיכולת הטכנית.</p>
+      </details>
+      <details style="border-bottom:1px solid var(--line);padding:20px 0">
+        <summary style="cursor:pointer;font-family:var(--f-display);font-weight:400;font-size:clamp(20px,2.4vw,29px);color:var(--paper)">תוך כמה זמן רואים תוצאות?</summary>
+        <p style="color:#98A0AE;font-size:16px;line-height:1.85;margin-top:12px">תוכן אורגני ונוכחות מתחילים לעבוד כבר מהשבועות הראשונים, ומדיה ממומנת יכולה להביא פניות תוך ימים. בניית מותג חזק היא תהליך מתמשך שמצטבר לאורך חודשים.</p>
+      </details>
     </div>
   </div>
 </section>
+
 <!-- 08 -->
 <section class="contact" id="contact">
   <div class="wrap contact-in">
@@ -922,7 +856,7 @@ html.a11y-spacing .wt,html.a11y-spacing .stat .k{line-height:2.1 !important;lett
     <div class="contact-list reveal" style="transition-delay:.12s">
       <a class="c-row" href="https://wa.me/972524030370" target="_blank" rel="noopener"><span class="lbl">WHATSAPP</span><span class="val">052-4030370</span></a>
       <a class="c-row" href="tel:+972524030370"><span class="lbl">PHONE</span><span class="val">052-4030370</span></a>
-      <a class="c-row" href="/cdn-cgi/l/email-protection#57353625173627322f3a36253c32233e39307934383a"><span class="lbl">EMAIL</span><span class="val"><span class="__cf_email__" data-cfemail="1173706351706174697c70637a7465787f763f727e7c">[email&#160;protected]</span></span></a>
+      <a class="c-row" href="mailto:bar@apexmarketing.co.il"><span class="lbl">EMAIL</span><span class="val">bar@apexmarketing.co.il</span></a>
       <a class="c-row" href="https://instagram.com/barshushan7" target="_blank" rel="noopener"><span class="lbl">INSTAGRAM</span><span class="val">@barshushan7</span></a>
     </div>
   </div>
@@ -931,6 +865,9 @@ html.a11y-spacing .wt,html.a11y-spacing .stat .k{line-height:2.1 !important;lett
 </main>
 
 <footer>
+  <nav class="foot-nav" aria-label="ניווט תחתון">
+    <a href="/אודות">אודות</a><a href="/חברת-שיווק-לסוכנויות-רכב">שיווק לסוכנויות רכב</a><a href="/שיווק-ליבואני-רכב">שיווק ליבואני רכב</a><a href="/שיווק-לרכבי-יוקרה">שיווק לרכבי יוקרה</a><a href="/שיווק-דיגיטלי-לעולם-הרכב">שיווק דיגיטלי לעולם הרכב</a><a href="/בר-שושן">בר שושן</a><a href="/שיווק-לעולם-הרכב">בלוג</a>
+  </nav>
   <div class="foot-in">
     <span style="display:flex;align-items:center;gap:10px"><img loading="lazy" src="assets/apex.png" alt="">© 2026 APEX MARKETING</span>
     <span class="foot-links">
@@ -956,7 +893,7 @@ html.a11y-spacing .wt,html.a11y-spacing .stat .k{line-height:2.1 !important;lett
   <svg viewBox="0 0 24 24"><path d="M17.47 14.38c-.3-.15-1.75-.86-2.02-.96-.27-.1-.47-.15-.67.15-.2.3-.77.96-.94 1.16-.17.2-.35.22-.64.07-.3-.15-1.25-.46-2.38-1.47-.88-.78-1.47-1.75-1.65-2.05-.17-.3-.02-.46.13-.6.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.6-.92-2.2-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.22 3.08c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.63.71.22 1.36.19 1.87.12.57-.09 1.75-.72 2-1.41.25-.7.25-1.28.17-1.41-.07-.13-.27-.2-.57-.35zM12.04 21.5h-.01a9.4 9.4 0 01-4.79-1.31l-.34-.2-3.56.93.95-3.47-.22-.36a9.36 9.36 0 01-1.44-5A9.44 9.44 0 0112.05 2.6c2.52 0 4.89.98 6.67 2.77a9.36 9.36 0 012.76 6.67c0 5.2-4.25 9.46-9.44 9.46zM20.5 3.5A11.83 11.83 0 0012.04.02C5.5.02.2 5.32.2 11.85c0 2.09.55 4.13 1.6 5.93L.1 24l6.37-1.67a11.8 11.8 0 005.57 1.42h.01c6.53 0 11.84-5.31 11.84-11.84 0-3.17-1.23-6.14-3.47-8.38z"/></svg>
 </a>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 /* lap bar + nav */
 const lap=document.getElementById('lap'),nav=document.getElementById('nav');
 addEventListener('scroll',()=>{
@@ -1026,7 +963,7 @@ document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
   const kmh=[0]; for(let g=1;g<=6;g++) kmh[g]=0.00743*Math.pow(1.389,g-1); /* continuous across shifts */
 
   function frame(ts){
-    if(!running||document.documentElement.classList.contains('a11y-nomotion')){last=null;return;}
+    if(!running){last=null;return;}
     if(last===null) last=ts;
     const dt=Math.min((ts-last)/1000,.06); last=ts;
 
@@ -1076,7 +1013,7 @@ document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 
 /* ===== language switch (HE / EN) ===== */
 (()=>{
-  const EN={"nav1": "Approach", "nav2": "Services", "nav3": "Why Us", "nav4": "Track", "nav5": "Clients", "nav6": "Work", "navcta": "Talk to us", "eyebrow": "MARKETING DONE RIGHT FOR THE AUTOMOTIVE WORLD", "h1a": "The home of marketing", "h1b": "for the automotive world", "herosub": "Apex is the full marketing department for car dealerships, car importers and luxury car businesses. Car photography, editing, creative, social management and paid media under one roof.", "herosubb": "Everything a marketing manager and a whole team would do for you, for the cost of a single salary.", "cta1": "Let's talk", "cta2": "See our work", "s1a": "A full marketing department.", "s1b": "Without having to build one.", "s1lead": "A business that wants to market seriously needs a marketing manager, a photographer, an editor, a creative and a media buyer. That is five salaries, plus hiring, managing and equipment. With us it is one supplier, one accountability, and a team that already works together.", "colA": "Hire a marketing manager", "a1": "A fixed monthly salary, before benefits", "a2": "You still need an outside photographer, editor and designer", "a3": "Dependent on one person. They are away, marketing stops", "a4": "Recruiting, handover and ramp-up time", "a5": "Camera gear and software at your expense", "a6": "Learning the automotive world on the job", "afoot": "High cost, partial coverage.", "colB": "Hire a department", "b1": "Strategy, creative, production and media in one price", "b2": "A photo and edit crew comes to you with all the gear", "b3": "A steady output rhythm, no gaps in the content calendar", "b4": "Work starts in the first week", "b5": "Systems, tools and automations included", "b6": "We know the automotive world from the inside, not from a brochure", "bfoot": "The cost of one salary. Full coverage.", "s2h": "The full package for automotive marketing", "sv1h": "Strategy & marketing management", "sv1p": "Building a marketing plan, defining audiences, messaging and a monthly content calendar. Someone who owns the big picture.", "sv2h": "Car photo & video production", "sv2p": "A professional crew for cars, products, venues and people. Stills and video, in studio or on location.", "sv3h": "Editing & post", "sv3p": "Video editing, colour, sound and graphics. From a fifteen second reel to a full brand film.", "sv4h": "Creative & copy", "sv4p": "Ideas, scripts and marketing copy. Creative built to convert, not just to look good.", "sv5h": "Social management", "sv5p": "Instagram, Facebook, TikTok and YouTube. Posting, community, stories and replies. Real daily management.", "sv6h": "Paid media", "sv6p": "Campaign management on Meta, Google, YouTube and TikTok. Weekly optimisation, creative testing and lead tracking.", "sv7h": "Branding & design", "sv7p": "Visual language, graphic assets, catalogues and decks. All consistent and true to one identity.", "sv8h": "Automation & systems", "sv8p": "Connecting leads to a CRM, auto-replies, scheduling and reporting. Less manual work, more control.", "sv9h": "Reporting & performance", "sv9p": "A clear monthly report with the numbers that matter. What worked, what did not, and what happens next month.", "s3a": "We do not", "s3b": "study", "s3c": "cars.", "s3d": "We live them.", "s3l1": "Most agencies get a brief about a car and read up on it online. We come from this world. An active rally driver competing in Europe, shooting race teams on circuits, and producing his own automotive content for an Israeli audience.", "s3l2": "It means we know how a car should sit in frame, what an actual buyer cares about, and exactly where the line runs between content that looks professional and content that looks like an ad. Our clients never have to explain anything to us.", "st1": "automotive brands under management", "st2": "From strategy to advertising, with no middlemen", "st3": "point of contact. One accountability for everything", "st4": "years in marketing", "clfoot": "Knowing when to shift gear is knowing when to raise a budget and when to stop a campaign.", "s4a": "We do not just win at marketing.", "s4b": "We win on track too.", "s4lead": "The Apex name does not stay in the office. It travels. On the bonnet of a rally car in Hungary, on the GT3 that finished first in GT World Challenge Europe, and on the Porsche in the German Carrera Cup. We are not an agency reading about motorsport from the sidelines. We are there, every race weekend.", "s4cap": "Gravel, dust, and our logo on the wing.", "s5h": "Some of our clients", "s6h": "Our work", "s6lead": "Campaigns, product films, reels and brand content. Some of the work that came out of our studio for automotive clients.", "w1": "One of the organic videos", "w2": "Organic video showcasing expertise", "w3": "Organic video, professional know-how", "w4": "Brand launch for electric off-road vehicles", "w5": "Service ads for BMW coding", "w6": "Ongoing social content", "w7": "PPF and nano coating campaign", "s7a": "You have a business.", "s7b": "Let us market it properly.", "fl0": "Terms of use", "fl1": "Accessibility statement", "fl2": "Privacy policy", "rights": "\u00a9 2026 Apex Marketing. All rights reserved. No part of this site, its content, design or photography, may be copied, reproduced, distributed or used commercially without prior written permission.", "marks": "Client trademarks and logos shown on this site are the property of their respective owners and appear for portfolio purposes only.", "a11y_t": "Accessibility", "a11y_font": "Text size", "a11y_contrast": "High contrast", "a11y_links": "Highlight links", "a11y_motion": "Stop animations", "a11y_readable": "Readable font", "a11y_spacing": "Increased line spacing", "a11y_reset": "Reset settings", "a11y_stmt": "Full accessibility statement", "skip": "Skip to main content", "_ticker": ["Strategy", "Production", "Editing", "Creative", "Social", "Paid Media", "Scripts", "Reels", "Branding", "Automation", "Reporting", "Shoots"], "_title": "Apex Marketing — The full marketing department for the automotive world", "_navaria": "Main navigation", "_railaria": "Selected work. Use arrow keys to scroll"};
+  const EN={"nav1": "Approach", "nav2": "Services", "nav3": "Why Us", "nav4": "Track", "nav5": "Clients", "nav6": "Work", "navabout": "About", "navbar": "Bar Shushan", "navcta": "Talk to us", "eyebrow": "MARKETING DONE RIGHT FOR THE AUTOMOTIVE WORLD", "h1a": "The home of marketing", "h1b": "for the automotive world", "herosub": "Apex is the full marketing department for car dealerships, car importers and luxury car businesses. Car photography, editing, creative, social management and paid media under one roof.", "herosubb": "Everything a marketing manager and a whole team would do for you, for the cost of a single salary.", "cta1": "Let's talk", "cta2": "See our work", "s1a": "A full marketing department.", "s1b": "Without having to build one.", "s1lead": "A business that wants to market seriously needs a marketing manager, a photographer, an editor, a creative and a media buyer. That is five salaries, plus hiring, managing and equipment. With us it is one supplier, one accountability, and a team that already works together.", "colA": "Hire a marketing manager", "a1": "A fixed monthly salary, before benefits", "a2": "You still need an outside photographer, editor and designer", "a3": "Dependent on one person. They are away, marketing stops", "a4": "Recruiting, handover and ramp-up time", "a5": "Camera gear and software at your expense", "a6": "Learning the automotive world on the job", "afoot": "High cost, partial coverage.", "colB": "Hire a department", "b1": "Strategy, creative, production and media in one price", "b2": "A photo and edit crew comes to you with all the gear", "b3": "A steady output rhythm, no gaps in the content calendar", "b4": "Work starts in the first week", "b5": "Systems, tools and automations included", "b6": "We know the automotive world from the inside, not from a brochure", "bfoot": "The cost of one salary. Full coverage.", "s2h": "The full package for automotive marketing", "sv1h": "Strategy & marketing management", "sv1p": "Building a marketing plan, defining audiences, messaging and a monthly content calendar. Someone who owns the big picture.", "sv2h": "Car photo & video production", "sv2p": "A professional crew for cars, products, venues and people. Stills and video, in studio or on location.", "sv3h": "Editing & post", "sv3p": "Video editing, colour, sound and graphics. From a fifteen second reel to a full brand film.", "sv4h": "Creative & copy", "sv4p": "Ideas, scripts and marketing copy. Creative built to convert, not just to look good.", "sv5h": "Social management", "sv5p": "Instagram, Facebook, TikTok and YouTube. Posting, community, stories and replies. Real daily management.", "sv6h": "Paid media", "sv6p": "Campaign management on Meta, Google, YouTube and TikTok. Weekly optimisation, creative testing and lead tracking.", "sv7h": "Branding & design", "sv7p": "Visual language, graphic assets, catalogues and decks. All consistent and true to one identity.", "sv8h": "Automation & systems", "sv8p": "Connecting leads to a CRM, auto-replies, scheduling and reporting. Less manual work, more control.", "sv9h": "Reporting & performance", "sv9p": "A clear monthly report with the numbers that matter. What worked, what did not, and what happens next month.", "s3a": "We do not", "s3b": "study", "s3c": "cars.", "s3d": "We live them.", "s3l1": "Most agencies get a brief about a car and read up on it online. We come from this world. An active rally driver competing in Europe, shooting race teams on circuits, and producing his own automotive content for an Israeli audience.", "s3l2": "It means we know how a car should sit in frame, what an actual buyer cares about, and exactly where the line runs between content that looks professional and content that looks like an ad. Our clients never have to explain anything to us.", "st1": "automotive brands under management", "st2": "From strategy to advertising, with no middlemen", "st3": "point of contact. One accountability for everything", "st4": "An active rally driver competing in Europe", "clfoot": "Knowing when to shift gear is knowing when to raise a budget and when to stop a campaign.", "s4a": "We do not just win at marketing.", "s4b": "We win on track too.", "s4lead": "The Apex name does not stay in the office. It travels. On the bonnet of a rally car in Hungary, on the GT3 that finished first in GT World Challenge Europe, and on the Porsche in the German Carrera Cup. We are not an agency reading about motorsport from the sidelines. We are there, every race weekend.", "s4cap": "Gravel, dust, and our logo on the bonnet.", "s5h": "Who already works with us", "s5note": "And that is only part of them.", "s6h": "Our work", "s6lead": "Campaigns, product films, reels and brand content. Some of the work that came out of our studio for automotive clients.", "w1": "One of the organic videos", "w2": "Organic video showcasing expertise", "w3": "Organic video, professional know-how", "w4": "Brand launch for electric off-road vehicles", "w5": "Service ads for BMW coding", "w6": "Ongoing social content", "w7": "PPF and nano coating campaign", "s7a": "You have a business.", "s7b": "Let us market it properly.", "fl0": "Terms of use", "fl1": "Accessibility statement", "fl2": "Privacy policy", "fl3": "Blog", "rights": "Apex Marketing, Business ID 206666463. © 2026 Apex Marketing. All rights reserved. No part of this site, its content, design or photography, may be copied, reproduced, distributed or used commercially without prior written permission.", "marks": "Client trademarks and logos shown on this site are the property of their respective owners and appear for portfolio purposes only.", "skip": "Skip to main content", "_ticker": ["Strategy", "Production", "Editing", "Creative", "Social", "Paid Media", "Scripts", "Reels", "Branding", "Automation", "Reporting", "Shoots"], "_title": "Apex Marketing — The full marketing department for the automotive world", "_navaria": "Main navigation", "_railaria": "Selected work. Use arrow keys to scroll"};
   const HE={}, HEticker=[...words];
   document.querySelectorAll('[data-i18n]').forEach(el=>{ HE[el.dataset.i18n]=el.textContent; });
   const btn=document.getElementById('langBtn'), txt=document.getElementById('langTxt');
@@ -1096,27 +1033,14 @@ document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
     railEl.setAttribute('aria-label', en?EN._railaria:'עבודות נבחרות. ניתן לגלול עם מקשי החיצים');
     const wl = en?EN._ticker:HEticker;
     document.getElementById('tickrow').innerHTML=[...wl,...wl].map(w=>`<span>${w}</span>`).join('');
-    txt.textContent = en?'עברית':'English';
+    txt.textContent = en?'עב':'EN';
     btn.setAttribute('aria-label', en?'מעבר לעברית':'Switch to English');
-    btn.setAttribute('title', en?'עברית':'English');
     const u=new URL(location);
     en ? u.searchParams.set('lang','en') : u.searchParams.delete('lang');
     history.replaceState(null,'',u);
   }
   btn.addEventListener('click',()=>apply(document.documentElement.lang==='en'?'he':'en'));
   if(new URLSearchParams(location.search).get('lang')==='en') apply('en');
-})();
-
-
-/* touch: light service cards as they scroll through view */
-(()=>{
-  if(matchMedia('(hover:hover)').matches) return;
-  const cards=[...document.querySelectorAll('.svc')];
-  if(!cards.length) return;
-  const io=new IntersectionObserver(es=>{
-    es.forEach(e=>e.target.classList.toggle('lit',e.isIntersecting));
-  },{rootMargin:'-38% 0px -38% 0px'});
-  cards.forEach(c=>io.observe(c));
 })();
 
 /* rail: keyboard + direction aware */
@@ -1133,94 +1057,5 @@ document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 })();
 
 </script>
-
-<button class="a11y-btn" id="a11yBtn" type="button" aria-expanded="false" aria-controls="a11yPanel" aria-label="פתיחת תפריט נגישות">
-  <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="3.6" r="2.1"/><path d="M20.4 7.1c0-.66-.54-1.2-1.2-1.2-.13 0-.25.02-.37.06L15 7.2c-1.9.6-3.1.6-3 .6s-1.1 0-3-.6L5.17 5.96a1.2 1.2 0 0 0-.37-.06c-.66 0-1.2.54-1.2 1.2 0 .53.34.98.82 1.14L9 9.9v3.3l-2.2 7.1a1.2 1.2 0 0 0 .8 1.5c.63.2 1.3-.16 1.5-.79L11 14.9h2l1.9 6.1c.2.63.87.99 1.5.79a1.2 1.2 0 0 0 .8-1.5L15 13.2V9.9l4.58-1.66c.48-.16.82-.61.82-1.14z"/></svg>
-</button>
-<div class="a11y-panel" id="a11yPanel" role="dialog" aria-label="תפריט נגישות" hidden>
-  <div class="a11y-head">
-    <strong data-i18n="a11y_t">נגישות</strong>
-    <button class="a11y-x" id="a11yClose" type="button" aria-label="סגירת תפריט נגישות">&#10005;</button>
-  </div>
-  <div class="a11y-row">
-    <span data-i18n="a11y_font">גודל טקסט</span>
-    <span class="a11y-steps">
-      <button type="button" data-step="-1" aria-label="הקטנת גודל הטקסט">A&minus;</button>
-      <span id="a11yZoomVal">100%</span>
-      <button type="button" data-step="1" aria-label="הגדלת גודל הטקסט">A+</button>
-    </span>
-  </div>
-  <button class="a11y-opt" type="button" data-flag="contrast" aria-pressed="false"><span data-i18n="a11y_contrast">ניגודיות גבוהה</span></button>
-  <button class="a11y-opt" type="button" data-flag="links" aria-pressed="false"><span data-i18n="a11y_links">הדגשת קישורים</span></button>
-  <button class="a11y-opt" type="button" data-flag="nomotion" aria-pressed="false"><span data-i18n="a11y_motion">עצירת אנימציות</span></button>
-  <button class="a11y-opt" type="button" data-flag="readable" aria-pressed="false"><span data-i18n="a11y_readable">גופן קריא</span></button>
-  <button class="a11y-opt" type="button" data-flag="spacing" aria-pressed="false"><span data-i18n="a11y_spacing">מרווח שורות מוגדל</span></button>
-  <button class="a11y-reset" id="a11yReset" type="button" data-i18n="a11y_reset">איפוס הגדרות</button>
-  <a class="a11y-link" href="accessibility.html" data-i18n="a11y_stmt">להצהרת הנגישות המלאה</a>
-</div>
-
-<script>
-/* ===== accessibility panel ===== */
-(function(){
-  var R=document.documentElement, KEY='apex-a11y';
-  var btn=document.getElementById('a11yBtn'), panel=document.getElementById('a11yPanel');
-  var close=document.getElementById('a11yClose'), reset=document.getElementById('a11yReset');
-  var zval=document.getElementById('a11yZoomVal');
-  var FLAGS=['contrast','links','nomotion','readable','spacing'];
-  var ZOOMS=[0.9,1,1.15,1.3,1.5,1.75];
-  var state={z:1,f:{}};
-
-  function load(){ try{var s=localStorage.getItem(KEY); if(s) state=JSON.parse(s);}catch(e){} }
-  function save(){ try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){} }
-
-  function smil(pause){
-    var svgs=document.getElementsByTagName('svg');
-    for(var i=0;i<svgs.length;i++){
-      try{ pause ? svgs[i].pauseAnimations() : svgs[i].unpauseAnimations(); }catch(e){}
-    }
-  }
-  function paint(){
-    R.style.setProperty('--a11y-zoom',state.z);
-    R.classList.toggle('a11y-zoom',state.z!==1);
-    zval.textContent=Math.round(state.z*100)+'%';
-    FLAGS.forEach(function(f){
-      var on=!!state.f[f];
-      R.classList.toggle('a11y-'+f,on);
-      var b=panel.querySelector('[data-flag="'+f+'"]');
-      if(b) b.setAttribute('aria-pressed',on?'true':'false');
-    });
-    smil(!!state.f.nomotion);
-  }
-  function open(o){
-    panel.hidden=!o; btn.setAttribute('aria-expanded',o?'true':'false');
-    if(o){ var t=panel.querySelector('button'); if(t) t.focus(); }
-  }
-
-  btn.addEventListener('click',function(){ open(panel.hidden); });
-  close.addEventListener('click',function(){ open(false); btn.focus(); });
-  document.addEventListener('keydown',function(e){
-    if(e.key==='Escape' && !panel.hidden){ open(false); btn.focus(); }
-  });
-  document.addEventListener('click',function(e){
-    if(!panel.hidden && !panel.contains(e.target) && !btn.contains(e.target)) open(false);
-  });
-  panel.querySelectorAll('[data-step]').forEach(function(b){
-    b.addEventListener('click',function(){
-      var i=ZOOMS.indexOf(state.z); if(i<0) i=1;
-      i=Math.min(ZOOMS.length-1,Math.max(0,i+parseInt(b.dataset.step,10)));
-      state.z=ZOOMS[i]; paint(); save();
-    });
-  });
-  panel.querySelectorAll('[data-flag]').forEach(function(b){
-    b.addEventListener('click',function(){
-      var f=b.dataset.flag; state.f[f]=!state.f[f]; paint(); save();
-    });
-  });
-  reset.addEventListener('click',function(){ state={z:1,f:{}}; paint(); save(); });
-
-  load(); paint();
-})();
-</script>
-
 </body>
 </html>
