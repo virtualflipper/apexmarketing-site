@@ -18,6 +18,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://apexmarketing.co.il/assets/og-v2.png">
 <link rel="canonical" href="https://apexmarketing.co.il/בר-שושן">
+<script>try{var _a=JSON.parse(localStorage.getItem('apex-a11y'));if(_a&&_a.f&&_a.f.light&&!_a.f.contrast)document.documentElement.classList.add('theme-light')}catch(e){}</script>
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <script type="application/ld+json">
@@ -46,8 +47,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Karantina:wght@300;400;700&family=Assistant:wght@200;300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/a11y.css">
 <style>
-:root{
+:root{--veil-rgb:8,9,12;
   --ink:#08090C; --ink-2:#0E1014; --ink-3:#151920; --line:#22262F;
   --paper:#EFF2F6; --muted:#8A92A1;
   --blue:#066DEA; --blue-lt:#3E92FF; --amber:#FFB020; --red:#FF3B30;
@@ -72,8 +74,8 @@ a{color:inherit}
 .skip:focus{top:0}
 :focus-visible{outline:3px solid var(--blue-lt);outline-offset:3px;border-radius:2px}
 nav{position:fixed;top:0;left:0;right:0;z-index:1000;backdrop-filter:blur(16px);
-  background:rgba(8,9,12,.75);border-bottom:1px solid transparent;transition:background .45s,border-color .45s}
-nav.stuck{background:rgba(8,9,12,.9);border-bottom-color:var(--line)}
+  background:rgba(var(--veil-rgb),.75);border-bottom:1px solid transparent;transition:background .45s,border-color .45s}
+nav.stuck{background:rgba(var(--veil-rgb),.9);border-bottom-color:var(--line)}
 .nav-in{max-width:var(--maxw);margin:0 auto;padding:15px var(--gutter);display:flex;align-items:center;justify-content:space-between;gap:24px}
 .brand{display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--paper)}
 .brand img{height:26px;width:auto;display:block;filter:drop-shadow(0 0 10px rgba(6,109,234,.5))}
@@ -84,7 +86,7 @@ nav.stuck{background:rgba(8,9,12,.9);border-bottom-color:var(--line)}
 .nav-links>a:hover,.nav-links>.has-drop>.drop-t:hover{color:var(--paper)} .nav-links>a:hover::after,.has-drop:hover .drop-t::after{width:100%}
 .nav-links a[aria-current="page"]{color:var(--paper)}
 .has-drop{position:relative}
-.drop{position:absolute;top:calc(100% + 12px);right:0;background:rgba(8,9,12,.97);border:1px solid var(--line);min-width:250px;
+.drop{position:absolute;top:calc(100% + 12px);right:0;background:rgba(var(--veil-rgb),.97);border:1px solid var(--line);min-width:250px;
   display:flex;flex-direction:column;opacity:0;visibility:hidden;transform:translateY(-6px);transition:opacity .25s,transform .25s,visibility .25s;padding:8px 0;backdrop-filter:blur(16px);box-shadow:0 20px 50px rgba(0,0,0,.5)}
 .has-drop:hover .drop,.has-drop:focus-within .drop{opacity:1;visibility:visible;transform:none}
 .drop a{padding:11px 20px;font-size:13.5px;color:var(--muted);text-decoration:none;transition:color .2s,background .2s;white-space:nowrap}
@@ -363,5 +365,6 @@ addEventListener('scroll',()=>{const h=document.documentElement.scrollHeight-inn
 const io=new IntersectionObserver(es=>{es.forEach(e=>{if(!e.isIntersecting)return;e.target.classList.add('in');io.unobserve(e.target);});},{threshold:.14,rootMargin:'0px 0px -6% 0px'});
 document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 </script>
+<script src="assets/a11y.js"></script>
 </body>
 </html>

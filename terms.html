@@ -7,13 +7,15 @@
 <meta name="description" content="תנאי השימוש באתר אפקס מרקטינג, לרבות זכויות יוצרים, קניין רוחני והגבלת אחריות.">
 <meta name="theme-color" content="#08090C">
 <meta name="robots" content="index, follow">
+<script>try{var _a=JSON.parse(localStorage.getItem('apex-a11y'));if(_a&&_a.f&&_a.f.light&&!_a.f.contrast)document.documentElement.classList.add('theme-light')}catch(e){}</script>
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Karantina:wght@400;700&family=Assistant:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/a11y.css">
 <style>
-:root{--ink:#08090C;--ink-2:#0E1014;--line:#22262F;--paper:#EFF2F6;--muted:#8A92A1;--blue:#066DEA;--blue-lt:#3E92FF;
+:root{--veil-rgb:8,9,12;--ink:#08090C;--ink-2:#0E1014;--line:#22262F;--paper:#EFF2F6;--muted:#8A92A1;--blue:#066DEA;--blue-lt:#3E92FF;
  --f-display:'Karantina','Arial Black',sans-serif;--f-body:'Assistant',sans-serif;--f-mono:'JetBrains Mono',monospace;
  --gutter:clamp(20px,5vw,80px)}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -23,7 +25,7 @@ body{background:var(--ink);color:var(--paper);font-family:var(--f-body);font-wei
 :focus-visible{outline:3px solid var(--blue-lt);outline-offset:3px}
 .skip{position:absolute;inset-inline-start:0;top:-100px;z-index:99;background:var(--blue);color:#fff;padding:12px 20px;font-weight:600;text-decoration:none}
 .skip:focus{top:0}
-header{border-bottom:1px solid var(--line);padding:18px 0;position:sticky;top:0;background:rgba(8,9,12,.9);backdrop-filter:blur(14px);z-index:10}
+header{border-bottom:1px solid var(--line);padding:18px 0;position:sticky;top:0;background:rgba(var(--veil-rgb),.9);backdrop-filter:blur(14px);z-index:10}
 .hd{max-width:840px;margin:0 auto;padding-inline:var(--gutter);display:flex;align-items:center;justify-content:space-between;gap:16px}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--paper)}
 .brand img{height:22px}
@@ -113,5 +115,6 @@ footer{border-top:1px solid var(--line);padding:26px 0;font-family:var(--f-mono)
   <span>© 2026 APEX MARKETING · כל הזכויות שמורות</span>
   <span><a href="/אודות">אודות</a> · <a href="/בר-שושן">בר שושן</a> · <a href="/שיווק-לעולם-הרכב">בלוג</a> · <a href="/terms.html">תנאי שימוש</a> · <a href="/accessibility.html">הצהרת נגישות</a> · <a href="/privacy.html">מדיניות פרטיות</a></span>
 </div></footer>
+<script src="assets/a11y.js"></script>
 </body>
 </html>
