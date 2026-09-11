@@ -191,9 +191,12 @@ footer{border-top:1px solid var(--line);padding:30px 0}
 .foot-links{display:flex;gap:16px;flex-wrap:wrap;align-items:center}
 .foot-links a{color:var(--muted);text-decoration:none;border-bottom:1px solid transparent;transition:color .25s,border-color .25s}
 .foot-links a:hover{color:var(--paper);border-bottom-color:var(--blue)}
-.foot-nav{max-width:var(--maxw);margin:0 auto 20px;padding-inline:var(--gutter);display:flex;gap:14px 30px;flex-wrap:wrap}
-.foot-nav a{color:var(--muted);text-decoration:none;font-size:13px;transition:color .25s}
+.foot-nav{position:static;background:none;backdrop-filter:none;box-shadow:none;z-index:auto;
+  max-width:var(--maxw);margin:0 auto 22px;padding:0 var(--gutter) 22px;display:flex;gap:10px 22px;flex-wrap:wrap;align-items:center;
+  border-bottom:1px solid var(--line)}
+.foot-nav a{color:var(--muted);text-decoration:none;font-size:13px;letter-spacing:.01em;transition:color .25s;white-space:nowrap}
 .foot-nav a:hover{color:var(--paper)}
+@media(max-width:600px){.foot-nav{gap:10px 16px;font-size:12.5px}}
 .foot-in img{height:18px;opacity:.7}
 .foot-rights{max-width:var(--maxw);margin:20px auto 0;padding-inline:var(--gutter);padding-top:18px;
   border-top:1px solid var(--line);font-size:12px;line-height:1.7;color:#6E7788;font-family:var(--f-body);
