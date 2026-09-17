@@ -43,7 +43,7 @@
       opt('spacing','a11y_spacing','מרווח שורות מוגדל')+
       opt('cursor','a11y_cursor','סמן מוגדל')+
       '<button class="a11y-reset" id="a11yReset" type="button" data-i18n="a11y_reset">איפוס הגדרות</button>'+
-      '<a class="a11y-link" href="accessibility.html" data-i18n="a11y_stmt">להצהרת הנגישות המלאה</a>'+
+      '<a class="a11y-link" href="/accessibility" data-i18n="a11y_stmt">להצהרת הנגישות המלאה</a>'+
     '</div>';
 
   var host=document.createElement('div'); host.id='a11yHost'; host.innerHTML=html;
