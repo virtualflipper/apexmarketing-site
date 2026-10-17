@@ -216,6 +216,16 @@ footer{border-top:1px solid var(--line);padding:30px 0}
 .wa:hover{transform:scale(1.1)}
 .wa svg{width:27px;height:27px;fill:#fff;position:relative;z-index:2}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}}
+.more{border-top:1px solid var(--line)}
+.more-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:clamp(28px,4vw,64px)}
+@media(max-width:900px){.more-grid{grid-template-columns:1fr}}
+.more .mk{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.2em;color:var(--muted);direction:ltr;text-align:right;margin-bottom:14px}
+.more-list{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.more-list a{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:16px 0;border-bottom:1px solid var(--line);color:var(--paper);text-decoration:none;font-size:16px;line-height:1.45;transition:color .25s,padding .35s}
+.more-list a::after{content:'←';color:var(--blue-lt);font-family:var(--f-mono);flex:none}
+[dir="ltr"] .more-list a::after{content:'→'}
+.more-list a:hover{color:var(--blue-lt);padding-inline-start:10px}
+.more-list a small{display:block;font-size:13px;color:var(--muted)}
 </style>
 <!-- Meta Pixel Code -->
 <script>
@@ -334,6 +344,16 @@ src="https://www.facebook.com/tr?id=1003085526107380&ev=PageView&noscript=1"
     </div>
   </div>
 </section>
+
+<section class="more" id="more">
+  <div class="wrap more-grid">
+    <div class="reveal"><div class="mk">FURTHER READING</div><h2 style="margin-bottom:22px">לקריאה <em>נוספת</em></h2>
+      <div class="more-list"><a href="/שיווק-ייבוא-רכב">שיווק ייבוא רכב אישי: איך בונים אמון ומייצרים פניות</a><a href="/מדיה-ממומנת-לסוכנויות-רכב">מדיה ממומנת נכונה לסוכנויות רכב: קמפיינים שמביאים לידים</a><a href="/תוכנית-שיווק-לעסק-רכב">תוכנית שיווק לעסק בעולם הרכב: שבעה עקרונות שעובדים</a></div></div>
+    <div class="reveal"><div class="mk">MORE SERVICES</div><h2 style="margin-bottom:22px">שירותים <em>נוספים</em></h2>
+      <div class="more-list"><a href="/חברת-שיווק-לסוכנויות-רכב"><span>שיווק לסוכנויות רכב<small>מלאי, טרייד אין ולידים שמגיעים למגרש</small></span></a><a href="/שיווק-לרכבי-יוקרה"><span>שיווק לרכבי יוקרה<small>תוכן ברמה של המותג שאתם מוכרים</small></span></a><a href="/שיווק-למוסכים"><span>שיווק למוסכים<small>לקוחות קבועים בלי לרדוף אחריהם</small></span></a><a href="/שיווק-דיגיטלי-לעולם-הרכב"><span>שיווק דיגיטלי לעולם הרכב<small>Meta, גוגל, סושיאל ולידים</small></span></a></div></div>
+  </div>
+</section>
+<div class="road"></div>
 
 <section class="contact" id="contact">
   <div class="wrap contact-in">
