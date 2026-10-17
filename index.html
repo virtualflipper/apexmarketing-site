@@ -262,6 +262,81 @@ h2 em{font-style:normal;color:var(--blue-lt)}
 .col.hot .col-foot{color:var(--paper);font-weight:600}
 @media(max-width:820px){.compare{grid-template-columns:1fr}.col:first-child{border-left:none;border-bottom:1px solid var(--line)}}
 
+/* CALCULATOR (01): tick the roles, the total runs, WhatsApp message is prefilled */
+.calc-hint{font-size:13.5px;color:var(--muted);margin:-12px 0 18px;line-height:1.5}
+.roles{display:flex;flex-direction:column;border:1px solid var(--line);background:var(--ink)}
+.role{display:flex;align-items:center;gap:14px;padding:13px 16px;border-bottom:1px solid var(--line);cursor:pointer;position:relative;overflow:hidden;transition:background .35s;user-select:none}
+.role:last-child{border-bottom:none}
+.role::before{content:'';position:absolute;top:-60%;right:-30%;width:60%;height:220%;background:linear-gradient(90deg,transparent,rgba(6,109,234,.12),transparent);transform:translateX(120%) rotate(12deg);transition:transform .8s cubic-bezier(.2,.8,.2,1)}
+.role:hover{background:var(--ink-3)} .role:hover::before{transform:translateX(-220%) rotate(12deg)}
+.role input{position:absolute;opacity:0;width:1px;height:1px}
+.sw{flex:none;width:42px;height:23px;border:1px solid #3A4150;background:#141820;position:relative;transition:background .3s,border-color .3s}
+.sw::after{content:'';position:absolute;top:3px;right:3px;width:15px;height:15px;background:#5C6577;transition:transform .3s cubic-bezier(.2,.8,.2,1),background .3s}
+.role input:checked~.sw{background:rgba(6,109,234,.25);border-color:var(--blue)}
+.role input:checked~.sw::after{transform:translateX(-19px);background:var(--blue-lt);box-shadow:0 0 10px var(--blue-lt)}
+[dir="ltr"] .sw::after{right:auto;left:3px}
+[dir="ltr"] .role input:checked~.sw::after{transform:translateX(19px)}
+.role input:focus-visible~.sw{outline:3px solid var(--blue-lt);outline-offset:3px}
+.role .rt{flex:1;min-width:0;position:relative;z-index:2}
+.role .rt h4{font-family:var(--f-display);font-weight:400;font-size:clamp(20px,1.8vw,26px);line-height:1;color:#B9C0CC;transition:color .3s}
+.role .rt p{font-size:13px;color:var(--muted);line-height:1.45;margin-top:3px}
+.role input:checked~.rt h4{color:var(--paper)}
+.role .amt{flex:none;font-family:var(--f-mono);font-size:13.5px;color:var(--muted);direction:ltr;text-align:right;font-variant-numeric:tabular-nums;transition:color .3s;position:relative;z-index:2;line-height:1.2}
+.role .amt small{display:block;font-size:9px;letter-spacing:.14em}
+.role input:checked~.amt{color:var(--blue-lt)}
+.calc-total{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;margin-top:22px;padding-top:18px;border-top:1px solid var(--line);flex-wrap:wrap}
+.calc-total .ct-k{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.2em;color:var(--muted);padding-bottom:10px}
+.calc-total .ct-v{font-family:var(--f-display);font-weight:700;font-size:clamp(48px,5vw,76px);line-height:.85;direction:ltr;font-variant-numeric:tabular-nums;color:var(--paper)}
+.calc-total .ct-v small{font-size:.45em;color:var(--blue-lt);font-weight:400;margin-left:6px}
+.calc-cta{display:flex;flex-direction:column;gap:16px;margin-top:22px}
+.calc-vs{display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:14.5px;color:var(--muted)}
+.calc-vs b{font-family:var(--f-display);font-weight:700;font-size:30px;line-height:1;color:var(--paper);margin-inline-end:6px;direction:ltr}
+.calc-vs .arrow{width:34px;height:1px;background:var(--blue);position:relative;flex:none}
+.calc-vs .arrow::after{content:'';position:absolute;left:-1px;top:-3px;width:7px;height:7px;border-left:1px solid var(--blue);border-bottom:1px solid var(--blue);transform:rotate(45deg)}
+[dir="ltr"] .calc-vs .arrow::after{left:auto;right:-1px;transform:rotate(-135deg)}
+.calc-vs .hot b{color:var(--blue-lt)}
+.btn-wa{background:#1FA855} .btn-wa:hover{box-shadow:0 12px 34px rgba(31,168,85,.35)}
+.btn-wa svg{width:18px;height:18px;fill:#fff;position:relative;z-index:2;transition:fill .3s} .btn-wa:hover svg{fill:var(--ink)}
+.btn-full{width:100%;justify-content:center}
+html.theme-light .sw{background:#DDE1E8;border-color:#C9CFDA} html.theme-light .sw::after{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+html.theme-light .role .rt h4{color:#3B4351} html.theme-light .role .rt p{color:#5B6474}
+html.theme-light .btn-wa:hover svg{fill:#fff}
+
+/* FIT (07): three questions, a recommendation, a prefilled WhatsApp message */
+.fit{background:var(--ink-2);border-block:1px solid var(--line)}
+.quiz{border:1px solid var(--line);background:var(--ink);position:relative;overflow:hidden;margin-top:8px}
+.quiz::before{content:'';position:absolute;top:0;right:0;height:2px;background:var(--blue);width:var(--qp,0%);transition:width .6s cubic-bezier(.2,.8,.2,1);box-shadow:0 0 12px var(--blue);z-index:2}
+[dir="ltr"] .quiz::before{right:auto;left:0}
+.q-in{padding:clamp(22px,3vw,44px)}
+.q-top{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:20px;flex-wrap:wrap}
+.q-step{font-family:var(--f-mono);font-size:11px;letter-spacing:.24em;color:var(--blue-lt);direction:ltr}
+.q-back{background:transparent;border:1px solid var(--line);color:var(--paper);cursor:pointer;font-family:var(--f-body);font-size:13px;padding:8px 14px;transition:border-color .3s,background .3s}
+.q-back:hover{border-color:var(--blue);background:rgba(6,109,234,.12)}
+.q-q{font-family:var(--f-display);font-weight:700;font-size:clamp(32px,4.2vw,60px);line-height:.95;margin-bottom:24px;max-width:24ch}
+.q-q em{font-style:normal;color:var(--blue-lt)}
+.q-opts{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media(max-width:1000px){.q-opts{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.q-opts{grid-template-columns:1fr}}
+.q-opt{background:var(--ink-2);border:1px solid var(--line);color:var(--paper);text-align:start;cursor:pointer;padding:20px 20px 18px;font-family:var(--f-body);position:relative;overflow:hidden;transition:border-color .3s,background .3s,transform .3s;display:flex;flex-direction:column;gap:6px;min-width:0}
+.q-opt .qn{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.2em;color:var(--muted);direction:ltr;text-align:start}
+.q-opt .qt{font-family:var(--f-display);font-weight:400;font-size:clamp(23px,2vw,30px);line-height:1}
+.q-opt .qd{font-size:13px;color:var(--muted);line-height:1.5;font-weight:300}
+.q-opt::after{content:'';position:absolute;bottom:0;right:0;left:0;height:2px;background:var(--blue);transform:scaleX(0);transform-origin:right;transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+.q-opt:hover{border-color:var(--blue);background:var(--ink-3);transform:translateY(-2px)} .q-opt:hover::after{transform:scaleX(1)}
+.q-opt.pick{border-color:var(--blue);background:rgba(6,109,234,.14)} .q-opt.pick::after{transform:scaleX(1)}
+.q-res{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(22px,3vw,44px);align-items:start}
+@media(max-width:900px){.q-res{grid-template-columns:1fr}}
+.q-rec{list-style:none;display:flex;flex-direction:column;gap:12px}
+.q-rec li{display:flex;gap:12px;align-items:flex-start;font-size:15.5px;color:#C6CCD6;line-height:1.55}
+.q-rec li::before{content:'';flex:none;width:6px;height:6px;margin-top:10px;background:var(--blue);box-shadow:0 0 8px var(--blue)}
+.q-rec li.em{color:var(--paper);font-weight:600}
+.q-card{border:1px solid var(--line);background:var(--ink-2);padding:clamp(18px,2.2vw,28px);display:flex;flex-direction:column;gap:14px}
+.q-card .col-tag{margin-bottom:0;display:flex;justify-content:space-between} .q-card .col-tag b{color:var(--blue-lt);font-weight:500}
+.q-msg{border:1px dashed #3A4150;padding:14px 16px;font-size:14.5px;line-height:1.7;color:#A9B0BC;user-select:text}
+.q-fade{animation:qfade .5s cubic-bezier(.2,.8,.2,1)}
+@keyframes qfade{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+html.theme-light .q-rec li{color:#1F2632} html.theme-light .q-msg{color:#3B4351;border-color:#C9CFDA}
+
 /* SERVICES */
 .services{background:var(--ink-2);border-block:1px solid var(--line)}
 .svc-grid{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);border-right:1px solid var(--line)}
@@ -606,18 +681,35 @@ src="https://www.facebook.com/tr?id=1003085526107380&ev=PageView&noscript=1"
       <h2><span data-i18n="s1a">מחלקת שיווק שלמה.</span><br><em><span data-i18n="s1b">בלי להקים מחלקה.</span></em></h2>
     </div>
     <p class="sec-lead reveal"><span data-i18n="s1lead">עסק שרוצה לשווק ברצינות צריך מנהל שיווק, צלם, עורך, איש קריאייטיב ומנהל מדיה. זה חמש משכורות, גיוס, ניהול וציוד. אצלנו זה ספק אחד, אחריות אחת, וצוות שכבר עובד ביחד.</span></p>
-    <div class="compare reveal">
+    <!--
+      ========= מחשבון מחלקה מול גיוס =========
+      כל שורה היא תפקיד עם מחיר חודשי (data-amt). לשינוי מחיר: לעדכן גם את data-amt וגם את הטקסט המוצג.
+      data-name / data-en הם השמות שנכנסים להודעת הוואטסאפ.
+      ==========================================
+    -->
+    <div class="compare reveal" id="calc">
       <div class="col">
-        <div class="col-tag">OPTION A</div><h3><span data-i18n="colA">לגייס מנהל שיווק</span></h3>
-        <ul>
-          <li><span data-i18n="a1">משכורת חודשית קבועה, לפני תנאים סוציאליים</span></li>
-          <li><span data-i18n="a2">עדיין צריך צלם, עורך ומעצב חיצוניים</span></li>
-          <li><span data-i18n="a3">תלות באדם אחד. הוא נעדר, השיווק נעצר</span></li>
-          <li><span data-i18n="a4">תהליך גיוס, חפיפה וזמן להיכנס לתפקיד</span></li>
-          <li><span data-i18n="a5">ציוד צילום ותוכנות על חשבונכם</span></li>
-          <li><span data-i18n="a6">לומד את עולם הרכב תוך כדי תנועה</span></li>
-        </ul>
-        <div class="col-foot"><span data-i18n="afoot">עלות גבוהה, כיסוי חלקי.</span></div>
+        <div class="col-tag">OPTION A</div><h3><span data-i18n="colA">לגייס כל אחד בנפרד</span></h3>
+        <p class="calc-hint"><span data-i18n="calchint">סמנו את מי שהייתם צריכים. החשבון מתעדכן תוך כדי.</span></p>
+        <div class="roles" id="roles">
+          <label class="role"><input type="checkbox" id="calc-mgr" data-amt="8000" data-name="מנהל שיווק" data-en="marketing manager" checked><span class="sw" aria-hidden="true"></span>
+            <span class="rt"><h4><span data-i18n="r1h">מנהל שיווק</span></h4><p><span data-i18n="r1p">אסטרטגיה, לוח תוכן, אחריות על התמונה הגדולה</span></p></span><span class="amt">8,000<small>₪ / MO</small></span></label>
+          <label class="role"><input type="checkbox" id="calc-photo" data-amt="4000" data-name="צלם סטילס ווידאו" data-en="photographer" checked><span class="sw" aria-hidden="true"></span>
+            <span class="rt"><h4><span data-i18n="r2h">צלם סטילס ווידאו</span></h4><p><span data-i18n="r2p">רכבים, מתחמים ואנשים, בשטח ובאולפן</span></p></span><span class="amt">4,000<small>₪ / MO</small></span></label>
+          <label class="role"><input type="checkbox" id="calc-edit" data-amt="2000" data-name="עורך וידאו" data-en="video editor" checked><span class="sw" aria-hidden="true"></span>
+            <span class="rt"><h4><span data-i18n="r3h">עורך וידאו</span></h4><p><span data-i18n="r3p">רילס, קולור, סאונד וגרפיקה</span></p></span><span class="amt">2,000<small>₪ / MO</small></span></label>
+          <label class="role"><input type="checkbox" id="calc-media" data-amt="1700" data-name="מנהל מדיה ממומנת" data-en="paid media manager" checked><span class="sw" aria-hidden="true"></span>
+            <span class="rt"><h4><span data-i18n="r4h">מנהל מדיה ממומנת</span></h4><p><span data-i18n="r4p">קמפיינים ב Meta וגוגל, אופטימיזציה ולידים</span></p></span><span class="amt">1,700<small>₪ / MO</small></span></label>
+          <label class="role"><input type="checkbox" id="calc-design" data-amt="1500" data-name="מעצב גרפי" data-en="graphic designer" checked><span class="sw" aria-hidden="true"></span>
+            <span class="rt"><h4><span data-i18n="r5h">מעצב גרפי</span></h4><p><span data-i18n="r5p">שפה ויזואלית, קטלוגים, מודעות</span></p></span><span class="amt">1,500<small>₪ / MO</small></span></label>
+          <label class="role"><input type="checkbox" id="calc-social" data-amt="3000" data-name="מנהל סושיאל וקהילה" data-en="social and community manager" checked><span class="sw" aria-hidden="true"></span>
+            <span class="rt"><h4><span data-i18n="r6h">מנהל סושיאל וקהילה</span></h4><p><span data-i18n="r6p">פרסום יומיומי, סטוריז, תגובות והודעות</span></p></span><span class="amt">3,000<small>₪ / MO</small></span></label>
+        </div>
+        <div class="calc-total">
+          <span class="ct-k" data-i18n="calctotal">סה״כ בחודש</span>
+          <span class="ct-v" aria-live="polite"><span id="calcTotal">20,200</span><small>₪</small></span>
+        </div>
+        <div class="col-foot"><span id="calcFoot">6 ספקים, 6 חשבוניות, ואף אחד לא אחראי על התמונה הגדולה.</span></div>
       </div>
       <div class="col hot">
         <div class="col-tag">APEX</div><h3><span data-i18n="colB">לשכור מחלקה</span></h3>
@@ -630,6 +722,17 @@ src="https://www.facebook.com/tr?id=1003085526107380&ev=PageView&noscript=1"
           <li><span data-i18n="b6">מכירים את עולם הרכב מבפנים, לא מברושור</span></li>
         </ul>
         <div class="col-foot"><span data-i18n="bfoot">עלות של משכורת אחת. כיסוי מלא.</span></div>
+        <div class="calc-cta">
+          <div class="calc-vs">
+            <span><b id="calcPeople">6</b> <span data-i18n="calcvsA">ספקים לנהל</span></span>
+            <i class="arrow" aria-hidden="true"></i>
+            <span class="hot"><b>1</b> <span data-i18n="calcvsB">איש קשר</span></span>
+          </div>
+          <a class="btn btn-wa btn-full" id="calcWa" href="https://wa.me/972524030370" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.47 14.38c-.3-.15-1.75-.86-2.02-.96-.27-.1-.47-.15-.67.15-.2.3-.77.96-.94 1.16-.17.2-.35.22-.64.07-.3-.15-1.25-.46-2.38-1.47-.88-.78-1.47-1.75-1.65-2.05-.17-.3-.02-.46.13-.6.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.6-.92-2.2-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.22 3.08c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.63.71.22 1.36.19 1.87.12.57-.09 1.75-.72 2-1.41.25-.7.25-1.28.17-1.41-.07-.13-.27-.2-.57-.35zM12.04 21.5h-.01a9.4 9.4 0 01-4.79-1.31l-.34-.2-3.56.93.95-3.47-.22-.36a9.36 9.36 0 01-1.44-5A9.44 9.44 0 0112.05 2.6c2.52 0 4.89.98 6.67 2.77a9.36 9.36 0 012.76 6.67c0 5.2-4.25 9.46-9.44 9.46zM20.5 3.5A11.83 11.83 0 0012.04.02C5.5.02.2 5.32.2 11.85c0 2.09.55 4.13 1.6 5.93L.1 24l6.37-1.67a11.8 11.8 0 005.57 1.42h.01c6.53 0 11.84-5.31 11.84-11.84 0-3.17-1.23-6.14-3.47-8.38z"/></svg>
+            <span><span data-i18n="calccta">שלחו לנו הודעה</span></span>
+          </a>
+        </div>
       </div>
     </div>
   </div>
@@ -882,11 +985,21 @@ src="https://www.facebook.com/tr?id=1003085526107380&ev=PageView&noscript=1"
 
 </section>
 
-<!-- 06 -->
-<!-- 07 FAQ -->
+<div class="road"></div>
+
+<!-- 07 FIT: שלוש שאלות, המלצה, והודעת וואטסאפ מוכנה. התוכן והתרגום יושבים בסקריפט למטה (fit quiz) -->
+<section class="fit" id="fit">
+  <div class="wrap">
+    <div class="sec-head reveal"><span class="sec-num">07 / FIT</span><h2><span data-i18n="s8a">מה העסק שלכם</span> <em><span data-i18n="s8b">צריך?</span></em></h2></div>
+    <p class="sec-lead reveal"><span data-i18n="s8lead">שלוש שאלות, לחיצה אחת כל פעם. בסוף תקבלו כיוון שמתאים לכם, והודעה מוכנה שרק צריך לשלוח.</span></p>
+    <div class="quiz reveal" id="quiz"><div class="q-in" id="qin"></div></div>
+  </div>
+</section>
+
+<!-- 08 FAQ -->
 <section id="faq">
   <div class="wrap">
-    <div class="sec-head reveal"><span class="sec-num">07 / FAQ</span><h2>שאלות נפוצות</h2></div>
+    <div class="sec-head reveal"><span class="sec-num">08 / FAQ</span><h2>שאלות נפוצות</h2></div>
     <div class="reveal" style="border-top:1px solid var(--line);max-width:64rem">
       <details style="border-bottom:1px solid var(--line);padding:20px 0">
         <summary style="cursor:pointer;font-family:var(--f-display);font-weight:400;font-size:clamp(20px,2.4vw,29px);color:var(--paper)">כמה עולה שיווק לסוכנות רכב?</summary>
@@ -908,11 +1021,11 @@ src="https://www.facebook.com/tr?id=1003085526107380&ev=PageView&noscript=1"
   </div>
 </section>
 
-<!-- 08 -->
+<!-- 09 -->
 <section class="contact" id="contact">
   <div class="wrap contact-in">
     <div class="reveal">
-      <span class="sec-num" style="margin-bottom:24px">08 / CONTACT</span>
+      <span class="sec-num" style="margin-bottom:24px">09 / CONTACT</span>
       <div class="big-cta"><span data-i18n="s7a">יש לכם עסק.</span><br><em><span data-i18n="s7b">בואו נעשה לו שיווק.</span></em></div>
     </div>
     <div class="contact-list reveal" style="transition-delay:.12s">
@@ -1075,9 +1188,144 @@ document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
   prev.addEventListener('click',()=>rail.scrollBy({left:(rtl()?1:-1)*step()*2,behavior:'smooth'}));
 })();
 
+/* ===== calculator (01): roles → running total → prefilled WhatsApp ===== */
+(()=>{
+  const roles=[...document.querySelectorAll('#roles input')];
+  if(!roles.length) return;
+  const totalEl=document.getElementById('calcTotal'), foot=document.getElementById('calcFoot');
+  const people=document.getElementById('calcPeople'), wa=document.getElementById('calcWa'), calc=document.getElementById('calc');
+  const fmt=n=>new Intl.NumberFormat('he-IL').format(Math.round(n));
+  const en=()=>document.documentElement.lang==='en';
+  const nomotion=()=>document.documentElement.classList.contains('a11y-nomotion')||matchMedia('(prefers-reduced-motion:reduce)').matches;
+  let shown=0,target=0,from=0,t0=null,raf=0;
+  function tween(ts){
+    if(t0===null){t0=ts;from=shown;}
+    const p=Math.min((ts-t0)/700,1), e=1-Math.pow(1-p,3);
+    shown=from+(target-from)*e; totalEl.textContent=fmt(shown);
+    if(p<1) raf=requestAnimationFrame(tween); else t0=null;
+  }
+  function go(){ cancelAnimationFrame(raf); t0=null; if(nomotion()){shown=target;totalEl.textContent=fmt(target);return;} raf=requestAnimationFrame(tween); }
+  function update(){
+    const on=roles.filter(r=>r.checked), n=on.length;
+    const sum=on.reduce((s,r)=>s+ +r.dataset.amt,0);
+    const names=on.map(r=>en()?r.dataset.en:r.dataset.name);
+    target=sum; go();
+    people.textContent=n;
+    foot.textContent = en()
+      ? (n===0?'Nobody ticked. That is what marketing that never happens looks like.':n===1?'One supplier, and a hole everywhere else.':`${n} suppliers, ${n} invoices, and nobody owning the whole picture.`)
+      : (n===0?'בלי אף אחד, השיווק פשוט לא קורה.':n===1?'ספק אחד, וחור בכל השאר.':`${n} ספקים, ${n} חשבוניות, ואף אחד לא אחראי על התמונה הגדולה.`);
+    const text = en()
+      ? `Hi, I ran the calculator on your site. ${n?'I ticked: '+names.join(', ')+'.':'I have not ticked anyone yet.'} Separately it comes to about ₪${fmt(sum)} a month. I would love to hear what a full department costs with you.`
+      : `היי, עשיתי את החישוב באתר. ${n?'סימנתי: '+names.join(', ')+'.':'עוד לא סימנתי תפקידים.'} בנפרד זה יוצא לי בערך ${fmt(sum)} ₪ בחודש. אשמח לשמוע מה המחיר של מחלקה שלמה אצלכם.`;
+    wa.href='https://wa.me/972524030370?text='+encodeURIComponent(text);
+  }
+  roles.forEach(r=>r.addEventListener('change',update));
+  window.__apexCalcUpdate=update;
+  shown=target=roles.filter(r=>r.checked).reduce((s,r)=>s+ +r.dataset.amt,0);
+  update();
+  /* count up from zero the first time the block scrolls into view */
+  new IntersectionObserver((es,o)=>{ es.forEach(e=>{ if(!e.isIntersecting) return; shown=0; go(); o.disconnect(); }); },{threshold:.3}).observe(calc);
+})();
+
+/* ===== fit quiz (07): three questions → recommendation → prefilled WhatsApp ===== */
+(()=>{
+  const qin=document.getElementById('qin'), quiz=document.getElementById('quiz');
+  if(!qin) return;
+  const en=()=>document.documentElement.lang==='en';
+  const WA='https://wa.me/972524030370?text=';
+  const T={
+    he:{
+      q:[
+        {k:'biz',q:'מה העסק שלכם?',o:[
+          ['סוכנות רכב','מגרש, טרייד אין, רכבי 0 ק״מ ויד שנייה'],
+          ['מוסך או מרכז שירות','טיפולים, ציפויים, קידוד, שיפורים'],
+          ['עסק אחר בעולם הרכב','יבואנים, אביזרים, סימולטורים, מוטורספורט'],
+          ['עסק אחר לגמרי?','בואו תאתגרו אותנו','עסק מחוץ לעולם הרכב']]},
+        {k:'now',q:'איך השיווק נראה היום?',o:[
+          ['אין שיווק בכלל','מפה לאוזן ומה שקורה לבד'],
+          ['מישהו פנימי עושה הכל','עובד שגם מצלם וגם מעלה'],
+          ['סוכנות אחרת','יש מישהו, לא בטוח שזה עובד'],
+          ['אני עושה את זה בעצמי','בין לקוח ללקוח, בלילה']]},
+        {k:'goal',q:'מה הכי חשוב בחצי השנה הקרובה?',o:[
+          ['יותר לידים ומכירות','טלפונים, הודעות, אנשים שמגיעים'],
+          ['נוכחות ומותג חזק','שידעו מי אתם ויבחרו בכם'],
+          ['תוכן קבוע בלי כאב ראש','שהדף יהיה חי בלי לרדוף אחרי זה'],
+          ['להתחיל סושיאל','סניף חדש, מותג חדש, או עסק שמתחיל סושיאל בפעם הראשונה']]}],
+      goal:[
+        ['מדיה ממומנת עם קריאייטיב שנבנה להמיר, לא רק להיראות טוב','חיבור הלידים ל CRM ומענה אוטומטי, כדי שאף פנייה לא תלך לאיבוד','צילום רכב שבועי שמזין את הקמפיינים בחומר טרי'],
+        ['אסטרטגיה ושפה ויזואלית אחידה לכל הפלטפורמות','סרט תדמית וסדרת רילס שמספרים מי אתם','ניהול סושיאל יומיומי, קהילה ותגובות'],
+        ['לוח תוכן חודשי עם ימי צילום קבועים','עריכה ופוסט לכל הפלטפורמות, בלי שתצטרכו לגעת','ניהול סושיאל וקהילה מהשבוע הראשון'],
+        ['פתיחת הערוצים נכון מהיום הראשון: פרופילים, שפה, הייליטס','יום צילום פתיחה שממלא את הדף כבר בחודש הראשון','תוכנית לשלושת החודשים הראשונים, כדי שהדף לא ימות אחרי שבועיים']],
+      biz:['דגש: הרכבים על המגרש, קטלוגים ומודעות מלאי שמביאות אנשים','דגש: תוכן ידע מקצועי שבונה אמון ומביא לקוחות לשער','דגש: נתפור לפי העסק בשיחה הראשונה, את עולם הרכב אנחנו כבר מכירים','דגש: אתגר התקבל. בשיחה הראשונה נבדוק ביחד אם אנחנו ההתאמה הנכונה'],
+      now:['מתחילים מאפס: קודם אסטרטגיה, אחר כך הפקה','הצוות שלנו משתלב עם האיש הפנימי ומשלים את מה שחסר','מתחילים מביקורת על מה שרץ היום ואיפה בורח כסף','משחררים אתכם לנהל את העסק, אנחנו לוקחים את השיווק'],
+      ui:{back:'חזרה',res:'מה היינו <em>בונים לכם</em>',again:'להתחיל מחדש',card:'YOUR MESSAGE',ready:'READY',send:'שלחו לנו הודעה'},
+      msg:(b,n,g)=>`היי, הגעתי דרך האתר. אנחנו ${b}. היום: ${n}. הכי חשוב לנו בחצי השנה הקרובה: ${g}. אשמח לשמוע איך מחלקת שיווק שלמה נראית אצלנו.`
+    },
+    en:{
+      q:[
+        {k:'biz',q:'What is your business?',o:[
+          ['Car dealership','Lot, trade in, new and used'],
+          ['Garage or service centre','Servicing, coatings, coding, upgrades'],
+          ['Another automotive business','Importers, accessories, simulators, motorsport'],
+          ['Something else entirely?','Challenge us','a business outside the automotive world']]},
+        {k:'now',q:'What does marketing look like today?',o:[
+          ['No marketing at all','Word of mouth and whatever happens on its own'],
+          ['Someone in house does it all','One employee who shoots and posts'],
+          ['Another agency','Someone is on it, not sure it works'],
+          ['I do it myself','Between customers, at night']]},
+        {k:'goal',q:'What matters most in the next six months?',o:[
+          ['More leads and sales','Calls, messages, people walking in'],
+          ['Presence and a strong brand','So people know who you are and choose you'],
+          ['Steady content, no headache','A page that stays alive without chasing it'],
+          ['Starting social','A new branch, a new brand, or a business going on social for the first time']]}],
+      goal:[
+        ['Paid media with creative built to convert, not just to look good','Leads wired into a CRM with auto replies, so no enquiry gets lost','A weekly car shoot that feeds the campaigns fresh material'],
+        ['Strategy and one visual language across every platform','A brand film and a reel series that tell who you are','Daily social management, community and replies'],
+        ['A monthly content calendar with fixed shoot days','Editing and post for every platform, without you touching it','Social and community management from week one'],
+        ['Opening the channels properly from day one: profiles, language, highlights','A launch shoot day that fills the page in the first month','A plan for the first three months, so the page does not die after two weeks']],
+      biz:['Focus: the cars on the lot, catalogues and inventory ads that bring people in','Focus: professional know how content that builds trust and brings customers to the gate','Focus: tailored to your business in the first call, the automotive world we already know','Focus: challenge accepted. In the first call we check together whether we are the right fit'],
+      now:['Starting from zero: strategy first, then production','Our crew slots in next to your in house person and fills what is missing','We start with a review of what runs today and where money leaks','We free you to run the business, we take the marketing'],
+      ui:{back:'Back',res:'What we would <em>build for you</em>',again:'Start over',card:'YOUR MESSAGE',ready:'READY',send:'Send us a message'},
+      msg:(b,n,g)=>`Hi, I came through the website. We are ${b}. Today: ${n}. What matters most in the next six months: ${g}. I would love to hear what a full marketing department looks like for us.`
+    }
+  };
+  const WASVG='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.47 14.38c-.3-.15-1.75-.86-2.02-.96-.27-.1-.47-.15-.67.15-.2.3-.77.96-.94 1.16-.17.2-.35.22-.64.07-.3-.15-1.25-.46-2.38-1.47-.88-.78-1.47-1.75-1.65-2.05-.17-.3-.02-.46.13-.6.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.6-.92-2.2-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.22 3.08c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.63.71.22 1.36.19 1.87.12.57-.09 1.75-.72 2-1.41.25-.7.25-1.28.17-1.41-.07-.13-.27-.2-.57-.35zM12.04 21.5h-.01a9.4 9.4 0 01-4.79-1.31l-.34-.2-3.56.93.95-3.47-.22-.36a9.36 9.36 0 01-1.44-5A9.44 9.44 0 0112.05 2.6c2.52 0 4.89.98 6.67 2.77a9.36 9.36 0 012.76 6.67c0 5.2-4.25 9.46-9.44 9.46zM20.5 3.5A11.83 11.83 0 0012.04.02C5.5.02.2 5.32.2 11.85c0 2.09.55 4.13 1.6 5.93L.1 24l6.37-1.67a11.8 11.8 0 005.57 1.42h.01c6.53 0 11.84-5.31 11.84-11.84 0-3.17-1.23-6.14-3.47-8.38z"/></svg>';
+  let step=0; const ans={};
+  function render(){
+    const L=en()?T.en:T.he, Q=L.q;
+    quiz.style.setProperty('--qp',(step/Q.length*100)+'%');
+    if(step<Q.length){
+      const q=Q[step];
+      qin.innerHTML=`<div class="q-fade"><div class="q-top"><span class="q-step">QUESTION 0${step+1} / 0${Q.length}</span>${step>0?`<button class="q-back" id="qback" type="button">${L.ui.back}</button>`:''}</div>
+        <div class="q-q">${q.q}</div>
+        <div class="q-opts">${q.o.map((o,i)=>`<button class="q-opt${ans[q.k]===i?' pick':''}" type="button" data-i="${i}"><span class="qn">0${i+1}</span><span class="qt">${o[0]}</span><span class="qd">${o[1]}</span></button>`).join('')}</div></div>`;
+      qin.querySelectorAll('.q-opt').forEach(b=>b.addEventListener('click',()=>{
+        qin.querySelectorAll('.q-opt').forEach(x=>x.classList.remove('pick')); b.classList.add('pick');
+        ans[q.k]=+b.dataset.i; setTimeout(()=>{step++;render();},260);
+      }));
+      const bk=document.getElementById('qback'); if(bk) bk.addEventListener('click',()=>{step--;render();});
+    } else {
+      const pick=(i,k)=>{const o=Q[i].o[ans[k]]; return o[2]||o[0];};
+      const text=L.msg(pick(0,'biz'),pick(1,'now'),pick(2,'goal'));
+      qin.innerHTML=`<div class="q-fade"><div class="q-top"><span class="q-step">RESULT</span><button class="q-back" id="qreset" type="button">${L.ui.again}</button></div>
+        <div class="q-res">
+          <div><div class="q-q">${L.ui.res}</div>
+            <ul class="q-rec">${L.goal[ans.goal].map((t,i)=>`<li${i===0?' class="em"':''}>${t}</li>`).join('')}<li>${L.biz[ans.biz]}</li><li>${L.now[ans.now]}</li></ul></div>
+          <div class="q-card">
+            <div class="col-tag"><span>${L.ui.card}</span><b>${L.ui.ready}</b></div>
+            <div class="q-msg">${text}</div>
+            <a class="btn btn-wa btn-full" href="${WA+encodeURIComponent(text)}" target="_blank" rel="noopener">${WASVG}<span>${L.ui.send}</span></a>
+          </div></div></div>`;
+      document.getElementById('qreset').addEventListener('click',()=>{step=0;render();});
+    }
+  }
+  window.__apexQuizRender=render;
+  render();
+})();
+
 /* ===== language switch (HE / EN) ===== */
 (()=>{
-  const EN={"nav1": "Approach", "nav2": "Services", "nav3": "Why Us", "nav4": "Track", "nav5": "Clients", "nav6": "Work", "navabout": "About", "navbar": "Bar Shushan", "navcta": "Talk to us", "a11y_t": "Accessibility", "a11y_light": "Light mode", "a11y_font": "Text size", "a11y_contrast": "High contrast", "a11y_links": "Highlight links", "a11y_motion": "Stop animations", "a11y_readable": "Readable font", "a11y_spacing": "Increased line spacing", "a11y_cursor": "Large cursor", "a11y_reset": "Reset settings", "a11y_stmt": "Full accessibility statement", "eyebrow": "MARKETING DONE RIGHT FOR THE AUTOMOTIVE WORLD", "h1a": "The home of marketing", "h1b": "for the automotive world", "herosub": "The full marketing department for car dealerships, importers and luxury car dealers. Photography, creative, social and paid media under one roof.", "herosubb": "Everything a marketing manager and a whole team would do for you, for the cost of a single salary.", "cta1": "Let's talk", "cta2": "See our work", "s1a": "A full marketing department.", "s1b": "Without having to build one.", "s1lead": "A business that wants to market seriously needs a marketing manager, a photographer, an editor, a creative and a media buyer. That is five salaries, plus hiring, managing and equipment. With us it is one supplier, one accountability, and a team that already works together.", "colA": "Hire a marketing manager", "a1": "A fixed monthly salary, before benefits", "a2": "You still need an outside photographer, editor and designer", "a3": "Dependent on one person. They are away, marketing stops", "a4": "Recruiting, handover and ramp-up time", "a5": "Camera gear and software at your expense", "a6": "Learning the automotive world on the job", "afoot": "High cost, partial coverage.", "colB": "Hire a department", "b1": "Strategy, creative, production and media in one price", "b2": "A photo and edit crew comes to you with all the gear", "b3": "A steady output rhythm, no gaps in the content calendar", "b4": "Work starts in the first week", "b5": "Systems, tools and automations included", "b6": "We know the automotive world from the inside, not from a brochure", "bfoot": "The cost of one salary. Full coverage.", "s2h": "The full package for automotive marketing", "sv1h": "Strategy & marketing management", "sv1p": "Building a marketing plan, defining audiences, messaging and a monthly content calendar. Someone who owns the big picture.", "sv2h": "Car photo & video production", "sv2p": "A professional crew for cars, products, venues and people. Stills and video, in studio or on location.", "sv3h": "Editing & post", "sv3p": "Video editing, colour, sound and graphics. From a fifteen second reel to a full brand film.", "sv4h": "Creative & copy", "sv4p": "Ideas, scripts and marketing copy. Creative built to convert, not just to look good.", "sv5h": "Social management", "sv5p": "Instagram, Facebook, TikTok and YouTube. Posting, community, stories and replies. Real daily management.", "sv6h": "Paid media", "sv6p": "Campaign management on Meta, Google, YouTube and TikTok. Weekly optimisation, creative testing and lead tracking.", "sv7h": "Branding & design", "sv7p": "Visual language, graphic assets, catalogues and decks. All consistent and true to one identity.", "sv8h": "Automation & systems", "sv8p": "Connecting leads to a CRM, auto-replies, scheduling and reporting. Less manual work, more control.", "sv9h": "Reporting & performance", "sv9p": "A clear monthly report with the numbers that matter. What worked, what did not, and what happens next month.", "s3a": "We do not", "s3b": "study", "s3c": "cars.", "s3d": "We live them.", "s3l1": "Most agencies get a brief about a car and read up on it online. We come from this world. An active rally driver competing in Europe, shooting race teams on circuits, and producing his own automotive content for an Israeli audience.", "s3l2": "It means we know how a car should sit in frame, what an actual buyer cares about, and exactly where the line runs between content that looks professional and content that looks like an ad. Our clients never have to explain anything to us.", "st1": "automotive brands under management", "st2": "From strategy to advertising, with no middlemen", "st3": "point of contact. One accountability for everything", "st4": "An active rally driver competing in Europe", "clfoot": "Knowing when to shift gear is knowing when to raise a budget and when to stop a campaign.", "s4a": "We do not just win at marketing.", "s4b": "We win on track too.", "s4lead": "The Apex name does not stay in the office. It travels. On the bonnet of a rally car in Hungary, on the GT3 that finished first in GT World Challenge Europe, and on the Porsche in the German Carrera Cup. We are not an agency reading about motorsport from the sidelines. We are there, every race weekend.", "s4cap": "Gravel, dust, and our logo on the bonnet.", "s5h": "Who already works with us", "s5note": "And that is only part of them.", "s6h": "Our work", "s6lead": "Campaigns, product films, reels and brand content. Some of the work that came out of our studio for automotive clients.", "w1": "One of the organic videos", "w2": "Organic video showcasing expertise", "w3": "Organic video, professional know-how", "w4": "Brand launch for electric off-road vehicles", "w5": "Service ads for BMW coding", "w6": "Ongoing social content", "w7": "PPF and nano coating campaign", "s7a": "You have a business.", "s7b": "Let us market it properly.", "fl0": "Terms of use", "fl1": "Accessibility statement", "fl2": "Privacy policy", "fl3": "Blog", "rights": "Apex Marketing, Business ID 206666463. © 2026 Apex Marketing. All rights reserved. No part of this site, its content, design or photography, may be copied, reproduced, distributed or used commercially without prior written permission.", "marks": "Client trademarks and logos shown on this site are the property of their respective owners and appear for portfolio purposes only.", "skip": "Skip to main content", "_ticker": ["Strategy", "Production", "Editing", "Creative", "Social", "Paid Media", "Scripts", "Reels", "Branding", "Automation", "Reporting", "Shoots"], "_title": "Apex Marketing — The full marketing department for the automotive world", "_navaria": "Main navigation", "_railaria": "Selected work. Use arrow keys to scroll"};
+  const EN={"nav1": "Approach", "nav2": "Services", "nav3": "Why Us", "nav4": "Track", "nav5": "Clients", "nav6": "Work", "navabout": "About", "navbar": "Bar Shushan", "navcta": "Talk to us", "a11y_t": "Accessibility", "a11y_light": "Light mode", "a11y_font": "Text size", "a11y_contrast": "High contrast", "a11y_links": "Highlight links", "a11y_motion": "Stop animations", "a11y_readable": "Readable font", "a11y_spacing": "Increased line spacing", "a11y_cursor": "Large cursor", "a11y_reset": "Reset settings", "a11y_stmt": "Full accessibility statement", "eyebrow": "MARKETING DONE RIGHT FOR THE AUTOMOTIVE WORLD", "h1a": "The home of marketing", "h1b": "for the automotive world", "herosub": "The full marketing department for car dealerships, importers and luxury car dealers. Photography, creative, social and paid media under one roof.", "herosubb": "Everything a marketing manager and a whole team would do for you, for the cost of a single salary.", "cta1": "Let's talk", "cta2": "See our work", "s1a": "A full marketing department.", "s1b": "Without having to build one.", "s1lead": "A business that wants to market seriously needs a marketing manager, a photographer, an editor, a creative and a media buyer. That is five salaries, plus hiring, managing and equipment. With us it is one supplier, one accountability, and a team that already works together.", "colA": "Hire each one separately", "calchint": "Tick the people you would need. The total updates as you go.", "r1h": "Marketing manager", "r1p": "Strategy, content calendar, owns the big picture", "r2h": "Photographer & videographer", "r2p": "Cars, venues and people, on location or in studio", "r3h": "Video editor", "r3p": "Reels, colour, sound and graphics", "r4h": "Paid media manager", "r4p": "Meta and Google campaigns, optimisation and leads", "r5h": "Graphic designer", "r5p": "Visual language, catalogues, ads", "r6h": "Social & community manager", "r6p": "Daily posting, stories, replies and messages", "calctotal": "TOTAL PER MONTH", "calcvsA": "suppliers to manage", "calcvsB": "point of contact", "calccta": "Send us a message", "s8a": "What does your business", "s8b": "need?", "s8lead": "Three questions, one tap each. At the end you get a direction that fits you, and a message that is ready to send.", "a1": "A fixed monthly salary, before benefits", "a2": "You still need an outside photographer, editor and designer", "a3": "Dependent on one person. They are away, marketing stops", "a4": "Recruiting, handover and ramp-up time", "a5": "Camera gear and software at your expense", "a6": "Learning the automotive world on the job", "afoot": "High cost, partial coverage.", "colB": "Hire a department", "b1": "Strategy, creative, production and media in one price", "b2": "A photo and edit crew comes to you with all the gear", "b3": "A steady output rhythm, no gaps in the content calendar", "b4": "Work starts in the first week", "b5": "Systems, tools and automations included", "b6": "We know the automotive world from the inside, not from a brochure", "bfoot": "The cost of one salary. Full coverage.", "s2h": "The full package for automotive marketing", "sv1h": "Strategy & marketing management", "sv1p": "Building a marketing plan, defining audiences, messaging and a monthly content calendar. Someone who owns the big picture.", "sv2h": "Car photo & video production", "sv2p": "A professional crew for cars, products, venues and people. Stills and video, in studio or on location.", "sv3h": "Editing & post", "sv3p": "Video editing, colour, sound and graphics. From a fifteen second reel to a full brand film.", "sv4h": "Creative & copy", "sv4p": "Ideas, scripts and marketing copy. Creative built to convert, not just to look good.", "sv5h": "Social management", "sv5p": "Instagram, Facebook, TikTok and YouTube. Posting, community, stories and replies. Real daily management.", "sv6h": "Paid media", "sv6p": "Campaign management on Meta, Google, YouTube and TikTok. Weekly optimisation, creative testing and lead tracking.", "sv7h": "Branding & design", "sv7p": "Visual language, graphic assets, catalogues and decks. All consistent and true to one identity.", "sv8h": "Automation & systems", "sv8p": "Connecting leads to a CRM, auto-replies, scheduling and reporting. Less manual work, more control.", "sv9h": "Reporting & performance", "sv9p": "A clear monthly report with the numbers that matter. What worked, what did not, and what happens next month.", "s3a": "We do not", "s3b": "study", "s3c": "cars.", "s3d": "We live them.", "s3l1": "Most agencies get a brief about a car and read up on it online. We come from this world. An active rally driver competing in Europe, shooting race teams on circuits, and producing his own automotive content for an Israeli audience.", "s3l2": "It means we know how a car should sit in frame, what an actual buyer cares about, and exactly where the line runs between content that looks professional and content that looks like an ad. Our clients never have to explain anything to us.", "st1": "automotive brands under management", "st2": "From strategy to advertising, with no middlemen", "st3": "point of contact. One accountability for everything", "st4": "An active rally driver competing in Europe", "clfoot": "Knowing when to shift gear is knowing when to raise a budget and when to stop a campaign.", "s4a": "We do not just win at marketing.", "s4b": "We win on track too.", "s4lead": "The Apex name does not stay in the office. It travels. On the bonnet of a rally car in Hungary, on the GT3 that finished first in GT World Challenge Europe, and on the Porsche in the German Carrera Cup. We are not an agency reading about motorsport from the sidelines. We are there, every race weekend.", "s4cap": "Gravel, dust, and our logo on the bonnet.", "s5h": "Who already works with us", "s5note": "And that is only part of them.", "s6h": "Our work", "s6lead": "Campaigns, product films, reels and brand content. Some of the work that came out of our studio for automotive clients.", "w1": "One of the organic videos", "w2": "Organic video showcasing expertise", "w3": "Organic video, professional know-how", "w4": "Brand launch for electric off-road vehicles", "w5": "Service ads for BMW coding", "w6": "Ongoing social content", "w7": "PPF and nano coating campaign", "s7a": "You have a business.", "s7b": "Let us market it properly.", "fl0": "Terms of use", "fl1": "Accessibility statement", "fl2": "Privacy policy", "fl3": "Blog", "rights": "Apex Marketing, Business ID 206666463. © 2026 Apex Marketing. All rights reserved. No part of this site, its content, design or photography, may be copied, reproduced, distributed or used commercially without prior written permission.", "marks": "Client trademarks and logos shown on this site are the property of their respective owners and appear for portfolio purposes only.", "skip": "Skip to main content", "_ticker": ["Strategy", "Production", "Editing", "Creative", "Social", "Paid Media", "Scripts", "Reels", "Branding", "Automation", "Reporting", "Shoots"], "_title": "Apex Marketing — The full marketing department for the automotive world", "_navaria": "Main navigation", "_railaria": "Selected work. Use arrow keys to scroll"};
   const HE={}, HEticker=[...words];
   document.querySelectorAll('[data-i18n]').forEach(el=>{ HE[el.dataset.i18n]=el.textContent; });
   const btn=document.getElementById('langBtn'), txt=document.getElementById('langTxt');
@@ -1099,6 +1347,8 @@ document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
     document.getElementById('tickrow').innerHTML=[...wl,...wl].map(w=>`<span>${w}</span>`).join('');
     txt.textContent = en?'עב':'EN';
     btn.setAttribute('aria-label', en?'מעבר לעברית':'Switch to English');
+    if(window.__apexCalcUpdate) window.__apexCalcUpdate();
+    if(window.__apexQuizRender) window.__apexQuizRender();
     const u=new URL(location);
     en ? u.searchParams.set('lang','en') : u.searchParams.delete('lang');
     history.replaceState(null,'',u);
