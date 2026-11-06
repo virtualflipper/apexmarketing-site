@@ -72,6 +72,8 @@ function bookInit() {
     var top = document.createElement('div'); top.id = 'bk-top'; $app.parentNode.insertBefore(top, $app);
     var ts = document.createElement('div'); ts.id = 'bk-ts'; ts.className = 'hide'; ts.style.margin = '6px 0 20px'; $app.parentNode.insertBefore(ts, $app.nextSibling);
   }
+  var mm = /[?&]manage=([a-z0-9]{1,16})\.([A-Za-z0-9_-]{10,40})/.exec(location.search);
+  if (mm) { addRef(mm[1], mm[2]); B.guest = true; try { history.replaceState(null, '', location.pathname); } catch (e) {} }
   loading();
   getConf().then(function (c) {
     var ses = store('apex_client_s');
@@ -85,8 +87,41 @@ function bookInit() {
 }
 function loadSlots() {
   clientTop(); loading();
-  call('bookData').then(function (d) { B.slots = d.slots; B.conf = d.conf; B.date = null; B.start = null; bookRender(); }).catch(fail);
+  Promise.all([call('bookData'), loadMine()]).then(function (r) { var d = r[0]; B.slots = d.slots; B.conf = d.conf; B.date = null; B.start = null; bookRender(); }).catch(fail);
 }
+/* my upcoming shoots: by Google login and/or booking references saved on this device */
+function myRefs() { var r = store('apex_my_refs'); return Array.isArray(r) ? r : []; }
+function addRef(id, tok) { var r = myRefs().filter(function (x) { return x.id !== id; }); r.unshift({ id: id, tok: tok }); store('apex_my_refs', r.slice(0, 20)); }
+function loadMine() {
+  var refs = myRefs();
+  if (!B.session && !refs.length) { B.mine = []; return Promise.resolve(); }
+  return call('clientBookings', { session: B.session || '', refs: refs }).then(function (list) { B.mine = list || []; }).catch(function () { B.mine = []; });
+}
+function mineBlock() {
+  if (!B.mine || !B.mine.length) return '';
+  return '<h2>הצילומים שלי</h2>' + B.mine.map(function (m) {
+    var open = B.cancelOpen === m.id;
+    var html = '<div class="card shoot"><div class="row" style="justify-content:space-between"><h4>' + esc(m.business) + '</h4><span class="badge">' + esc(m.label) + ' · ' + m.start + ' עד ' + m.end + '</span></div>' +
+      '<div class="kv"><div>כתובת</div><div>' + esc(m.address) + '</div>' + (m.photographer ? '<div>צלם</div><div>' + esc(m.photographer) + '</div>' : '') + '</div>';
+    if (!open) return html + '<div class="row"><button class="btn sm red" data-click="openCancel(\'' + m.id + '\')">ביטול הצילום</button></div></div>';
+    return html + '<div class="cancelbox"><label style="margin-top:0">סיבת הביטול (לא חובה)</label><textarea id="cx_reason" maxlength="300"></textarea>' +
+      (m.waPhotographer ? '<div class="row" style="margin:12px 0"><a class="btn sm wa" target="_blank" rel="noopener" href="' + esc(m.waPhotographer) + '">וואטסאפ לצלם</a></div>' : '') +
+      '<label class="check"><input id="cx_inf" type="checkbox"> עדכנתי את הצלם על הביטול</label>' +
+      '<div class="row" style="margin-top:12px"><button class="btn sm red" data-click="doClientCancel(\'' + m.id + '\',\'' + m.tok + '\')">ביטול סופי</button><button class="btn sm ghost" data-click="openCancel(\'\')">חזרה</button></div></div></div>';
+  }).join('');
+}
+function openCancel(id) { keepForm(); B.cancelOpen = id; bookRender(); }
+function doClientCancel(id, tok) {
+  var inf = document.getElementById('cx_inf');
+  if (!inf || !inf.checked) return alertBox('כדי לבטל צריך לסמן שעדכנתם את הצלם');
+  var reason = (document.getElementById('cx_reason') || {}).value || '';
+  loading();
+  call('clientCancel', { id: id, tok: tok, informed: true, reason: reason }).then(function () {
+    B.cancelOpen = null; return loadMine().then(function () { return call('bookData'); });
+  }).then(function (d) { B.slots = d.slots; bookRender(); setTimeout(function () { okBox('הצילום בוטל. שלחנו עדכון ל APEX'); }, 50); })
+    .catch(function (e) { bookRender(); alertBox(e.message); });
+}
+function okBox(m) { var el = document.createElement('div'); el.className = 'okbox'; el.textContent = m; $app.insertBefore(el, $app.firstChild); window.scrollTo({ top: 0, behavior: 'smooth' }); }
 /* first screen: Sign in with Google, or continue as a guest */
 function clientWelcome() {
   bar(''); var top = document.getElementById('bk-top'); if (top) top.innerHTML = '';
@@ -106,11 +141,11 @@ function applyProfile(pr, email, name) {
 }
 function bookRender(errMsg) {
   if (!B.slots.length) {
-    h('<h1>קביעת יום צילום</h1><div class="card"><b>כרגע אין מועדים פנויים</b><p class="muted">דברו איתנו ונמצא יחד מועד שמתאים לכם.</p></div>');
+    h('<h1>קביעת יום צילום</h1>' + mineBlock() + '<div class="card"><b>כרגע אין מועדים פנויים</b><p class="muted">דברו איתנו ונמצא יחד מועד שמתאים לכם.</p></div>');
     bar(''); return;
   }
   var day = B.slots.filter(function (s) { return s.date === B.date; })[0];
-  var html = '<h1>קביעת יום צילום</h1><p class="sub">בחרו יום ושעת התחלה שנוחים לכם. יום צילום נמשך כ ' + esc(B.conf.durationHours) + ' שעות.</p>';
+  var html = '<h1>קביעת יום צילום</h1>' + mineBlock() + (B.mine && B.mine.length ? '<h2>צילום חדש</h2>' : '') + '<p class="sub">בחרו יום ושעת התחלה שנוחים לכם. יום צילום נמשך כ ' + esc(B.conf.durationHours) + ' שעות.</p>';
   html += '<h2>1. באיזה יום?</h2><div class="grid">' + B.slots.map(function (s) {
     return '<button class="chip' + (s.date === B.date ? ' on' : '') + '" data-click="pickDate(\'' + s.date + '\')"><span>יום ' + DAYS[dow(s.date)] + '</span><b>' + dm(s.date) + '</b></button>';
   }).join('') + '</div>';
@@ -177,9 +212,10 @@ function submitBooking() {
     var gcal = 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent('צילום עם APEX') +
       '&dates=' + r.date.replace(/-/g, '') + 'T' + r.start.replace(':', '') + '00/' + r.date.replace(/-/g, '') + 'T' + r.end.replace(':', '') + '00&ctz=Asia/Jerusalem&location=' + encodeURIComponent(f.address);
     h('<div class="center"><div class="big-ok">✓</div><h1>הצילום נקבע!</h1><p class="sub">' + esc(r.label) + ' · ' + r.start + ' עד ' + r.end + '<br>' + esc(f.address) + '</p>' +
-      '<a class="btn" href="' + gcal + '" target="_blank">הוספה ליומן שלי</a><p class="muted small" style="margin-top:22px">הצלם שלנו יקבל עכשיו את כל הפרטים. אם צריך לשנות משהו, דברו איתנו.</p></div>');
+      '<a class="btn" href="' + gcal + '" target="_blank" rel="noopener">הוספה ליומן שלי</a> <button class="btn ghost" data-click="loadSlots()">הצילומים שלי</button><p class="muted small" style="margin-top:22px">הצלם שלנו יקבל עכשיו את כל הפרטים. אם צריך לשנות משהו, דברו איתנו.</p></div>');
     store('apex_client', { business: f.business, contact: f.contact, phone: f.phone, email: f.email, address: f.address, car: f.car });
-    B.form = null;
+    if (r.id && r.tok) addRef(r.id, r.tok);
+    B.form = null; loadMine();
   }).catch(function (e) {
     tsReset();
     call('bookData').then(function (d) { B.slots = d.slots; if (!B.slots.some(function (s) { return s.date === B.date && s.starts.indexOf(B.start) >= 0; })) B.start = null; bookRender(e.message); })
@@ -249,7 +285,7 @@ function teamRender(msg) {
     '<p class="sub">סמן באילו ימים ושעות אתה פנוי לצילום. לקוחות יוכלו לקבוע רק בזמנים שסימנת. אל תשכח לשמור.</p>';
   if (msg) html += '<div class="okbox">' + esc(msg) + '</div>';
   if (T.shoots.length) {
-    html += '<h2>הצילומים שלי</h2>' + T.shoots.map(shootCard).join('');
+    html += '<h2>הצילומים שלי</h2>' + T.shoots.map(function (s) { return T.adminPid ? shootCard(s) : teamShootCard(s); }).join('');
     html += '<h2>הזמינות שלי</h2>';
   }
   var start = T.today, end = addDays(T.today, T.horizon);
@@ -270,6 +306,21 @@ function teamRender(msg) {
   }
   h(html);
   bar('<button class="btn" id="save" data-click="teamSave()"' + (T.dirty ? '' : ' disabled') + '>' + (T.dirty ? 'שמירת הזמינות' : 'הכל שמור ✓') + '</button>');
+}
+function teamShootCard(s) {
+  if (T.cancelOpen !== s.id) return shootCard(s, '<button class="btn sm red" data-click="teamOpenCancel(\'' + s.id + '\')">ביטול הצילום</button>');
+  return shootCard(s) .replace(/<\/div>$/, '') + '<div class="cancelbox"><label style="margin-top:0">סיבת הביטול (לא חובה)</label><textarea id="tx_reason" maxlength="300"></textarea>' +
+    '<label class="check"><input id="tx_inf" type="checkbox"> עדכנתי את הלקוח על הביטול</label>' +
+    '<div class="row" style="margin-top:12px"><button class="btn sm red" data-click="doTeamCancel(\'' + s.id + '\')">ביטול סופי</button><button class="btn sm ghost" data-click="teamOpenCancel(\'\')">חזרה</button></div></div></div>';
+}
+function teamOpenCancel(id) { T.cancelOpen = id; var y = window.scrollY; teamRender(); window.scrollTo(0, y); }
+function doTeamCancel(id) {
+  var inf = document.getElementById('tx_inf');
+  if (!inf || !inf.checked) return alertBox('כדי לבטל צריך לסמן שעדכנת את הלקוח');
+  var reason = (document.getElementById('tx_reason') || {}).value || '';
+  loading();
+  call('teamCancel', { id: id, informed: true, reason: reason }).then(function (d) { teamLoaded(d); setTimeout(function () { okBox('הצילום בוטל. בר קיבל עדכון'); }, 50); })
+    .catch(function (e) { teamRender(); alertBox(e.message); });
 }
 function setDay(d, m) {
   if (m === 'no') delete T.days[d];
@@ -295,7 +346,7 @@ function shootCard(s, admin) {
   return '<div class="card shoot"><div class="row" style="justify-content:space-between"><h4>' + esc(s.business) + '</h4><span class="badge">' + esc(s.label) + ' · ' + s.start + ' עד ' + s.end + '</span></div>' +
     '<div class="kv"><div>איש קשר</div><div>' + esc(s.contact) + ' · <a style="color:var(--acc2)" href="tel:' + esc(s.phone) + '">' + esc(s.phone) + '</a></div><div>כתובת</div><div>' + esc(s.address) + '</div>' +
     (s.car ? '<div>רכבים</div><div>' + esc(s.car) + '</div>' : '') + (s.notes ? '<div>הערות</div><div>' + esc(s.notes) + '</div>' : '') + '</div>' +
-    '<div class="row"><a class="btn sm ghost" href="' + s.waze + '" target="_blank">Waze</a><a class="btn sm wa" href="' + s.waClient + '" target="_blank">וואטסאפ ללקוח</a>' + (admin || '') + '</div></div>';
+    '<div class="row"><a class="btn sm ghost" href="' + esc(s.waze) + '" target="_blank" rel="noopener">Waze</a><a class="btn sm wa" href="' + esc(s.waClient) + '" target="_blank" rel="noopener">וואטסאפ ללקוח</a>' + (admin || '') + '</div></div>';
 }
 
 /* ═════════════════════ ADMIN ═════════════════════ */
@@ -346,7 +397,8 @@ function adminShoots() {
     return shootCard(b, sel + (b.waPhotographer ? '<a class="btn sm wa" target="_blank" href="' + b.waPhotographer + '">וואטסאפ לצלם</a>' : '') + '<button class="btn sm red" data-click="cancelShoot(\'' + b.id + '\')">ביטול</button>');
   }).join('');
   if (rest.length) html += '<h2>עבר ובוטלו</h2>' + rest.map(function (b) {
-    return '<div class="card row" style="justify-content:space-between"><span>' + esc(b.label) + ' · ' + esc(b.business) + ' · ' + esc(b.photographer) + '</span><span class="badge ' + (b.status === 'בוטל' ? 'red' : 'gray') + '">' + (b.status === 'בוטל' ? 'בוטל' : 'עבר') + '</span></div>';
+    return '<div class="card"><div class="row" style="justify-content:space-between"><span>' + esc(b.label) + ' · ' + esc(b.business) + ' · ' + esc(b.photographer) + '</span><span class="badge ' + (b.status === 'בוטל' ? 'red' : 'gray') + '">' + (b.status === 'בוטל' ? 'בוטל' + (b.cancelledBy ? ' על ידי ' + esc(b.cancelledBy) : '') : 'עבר') + '</span></div>' +
+      (b.status === 'בוטל' && b.cancelReason ? '<p class="muted small" style="margin:8px 0 0">סיבה: ' + esc(b.cancelReason) + '</p>' : '') + '</div>';
   }).join('');
   return html;
 }
@@ -418,7 +470,7 @@ function adminConf() {
 }
 function adminCall(action, payload, msg) { loading(); call(action, payload).then(function (d) { A.d = d; adminRender(msg); window.scrollTo(0, 0); }).catch(function (e) { if (!e.message) return; adminRender(); alertBox(e.message); }); }
 function reassign(id, pid) { var n = A.d.team.filter(function (t) { return t.id === pid; })[0]; if (!confirm('להעביר את הצילום ל' + n.name + '? הוא יקבל התראה')) return adminRender(); adminCall('reassign', { id: id, photographerId: pid }, 'הצילום הועבר ל' + n.name); }
-function cancelShoot(id) { if (!confirm('לבטל את הצילום? הצלם יקבל הודעה והמועד ייפתח מחדש')) return; adminCall('cancel', { id: id }, 'הצילום בוטל'); }
+function cancelShoot(id) { var r = prompt('לבטל את הצילום? הצלם והלקוח יקבלו הודעה והמועד ייפתח מחדש.\nסיבת הביטול (לא חובה):', ''); if (r === null) return; adminCall('cancel', { id: id, reason: r }, 'הצילום בוטל'); }
 function savePerson(id) {
   var g = function (p) { var el = document.getElementById(p + '_' + id); return el ? el.value : ''; };
   var act = document.getElementById('a_' + id);
@@ -438,7 +490,8 @@ function reloadPage() { location.reload(); }
 /* CSP-safe event delegation: data-click="fn('a', this)" / data-change="fn('a', this.value)" */
 var ACTS = { pickDate: pickDate, pickStart: pickStart, submitBooking: submitBooking, teamPin: teamPin, teamNames: teamNames, teamLogout: teamLogout,
   setDay: setDay, setHour: setHour, weekFill: weekFill, weekClear: weekClear, teamSave: teamSave, copy: copy, setTab: setTab, reassign: reassign,
-  cancelShoot: cancelShoot, forgetClient: forgetClient, clientLogout: clientLogout, clientGuest: clientGuest, teamWelcome: teamWelcome, adminEditAvail: adminEditAvail, adminBack: adminBack, adminDoBook: adminDoBook, savePerson: savePerson, saveConf: saveConf, changePw: changePw, adminLogout: adminLogout, reloadPage: reloadPage, adminDoLogin: adminDoLogin };
+  cancelShoot: cancelShoot, forgetClient: forgetClient, openCancel: openCancel, doClientCancel: doClientCancel, loadSlots: loadSlots,
+  teamOpenCancel: teamOpenCancel, doTeamCancel: doTeamCancel, clientLogout: clientLogout, clientGuest: clientGuest, teamWelcome: teamWelcome, adminEditAvail: adminEditAvail, adminBack: adminBack, adminDoBook: adminDoBook, savePerson: savePerson, saveConf: saveConf, changePw: changePw, adminLogout: adminLogout, reloadPage: reloadPage, adminDoLogin: adminDoLogin };
 function runAct(el, code) {
   var m = /^(\w+)\(([\s\S]*)\)$/.exec(code || ''); if (!m || !ACTS[m[1]]) return;
   var args = [], re = /'((?:[^'\\]|\\.)*)'|(this\.value)|(this)/g, x;
