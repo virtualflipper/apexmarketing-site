@@ -72,3 +72,33 @@
 .cancelbox{margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
 .check{display:flex!important;gap:10px;align-items:center;color:var(--txt)!important;font-size:15px!important;cursor:pointer;margin:12px 0 0!important}
 .check input{width:20px;height:20px;accent-color:var(--bad)}
+.linkbtn{display:block;background:none;border:0;color:var(--acc2);font:600 15px Assistant,Arial;padding:14px 0 4px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.badge.amber{background:rgba(255,184,0,.12);color:#ffd27a;border-color:rgba(255,184,0,.4)}
+.card.req{border-color:rgba(255,184,0,.35)}
+.card.req.hl{box-shadow:0 0 0 2px var(--acc2)}
+/* availability calendar */
+.calhd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.calhd b{font-size:19px}
+.calhd .btn{min-width:44px;font-size:20px;line-height:1;padding:6px 12px}
+.calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.calgrid .wd{background:none;border:0;color:var(--mut);font:700 13px Assistant,Arial;padding:6px 0;cursor:pointer;border-radius:var(--r)}
+.calgrid .wd:hover{color:var(--txt);background:var(--card2)}
+.cd{position:relative;min-height:58px;background:var(--card2);border:1px solid var(--line);border-radius:var(--r);color:var(--txt);font:inherit;padding:7px 1px 5px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;user-select:none}
+.cd b{font-size:16px;line-height:1}
+.cd small{font-size:10.5px;line-height:1.15;color:var(--mut);white-space:nowrap}
+.cd.av{background:rgba(31,191,117,.14);border-color:rgba(31,191,117,.55)}
+.cd.av small{color:#a8f0c9}
+.cd.sel{background:rgba(6,109,234,.32);border-color:var(--acc2);box-shadow:inset 0 0 0 1px var(--acc2)}
+.cd.sel small{color:#dbe9ff}
+.cd.off{opacity:.28;cursor:default}
+.cd.today b{color:var(--acc2)}
+.cd i{position:absolute;top:2px;left:3px;font-style:normal;font-size:10px}
+.cd.blank{visibility:hidden}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--mut);margin-top:12px}
+.legend span::before{content:'';display:inline-block;width:10px;height:10px;border-radius:2px;margin-left:6px;vertical-align:-1px}
+.legend span:last-child::before{display:none}
+.legend .l-av::before{background:rgba(31,191,117,.55)}
+.legend .l-sel::before{background:var(--acc)}
+.calpanel.on{border-color:var(--acc2)}
+.hours{flex-wrap:wrap}
+@media(max-width:520px){.cd{min-height:54px}.cd small{font-size:9.5px}}
