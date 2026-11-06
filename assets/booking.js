@@ -72,7 +72,8 @@ function bookInit() {
     var top = document.createElement('div'); top.id = 'bk-top'; $app.parentNode.insertBefore(top, $app);
     var ts = document.createElement('div'); ts.id = 'bk-ts'; ts.className = 'hide'; ts.style.margin = '6px 0 20px'; $app.parentNode.insertBefore(ts, $app.nextSibling);
   }
-  var mm = /[?&]manage=([a-z0-9]{1,16})\.([A-Za-z0-9_-]{10,40})/.exec(location.search);
+  // manage link from the email: #manage=<id>.<ref> (a hash never reaches servers or logs)
+  var mm = /[#&]manage=([a-z0-9]{1,16})\.([A-Za-z0-9_-]{10,40})/.exec(location.hash);
   if (mm) { addRef(mm[1], mm[2]); B.guest = true; try { history.replaceState(null, '', location.pathname); } catch (e) {} }
   loading();
   getConf().then(function (c) {
@@ -162,7 +163,7 @@ function bookRender(errMsg) {
       '<div class="two"><div><label>איש קשר *</label><input id="f_contact" value="' + esc(f.contact) + '"></div>' +
       '<div><label>טלפון *</label><input id="f_phone" type="tel" inputmode="tel" value="' + esc(f.phone) + '"></div></div>' +
       '<label>כתובת הצילום *</label><input id="f_address" placeholder="רחוב, מספר ועיר" value="' + esc(f.address) + '">' +
-      '<label>מייל לאישור (לא חובה)</label><input id="f_email" type="email" inputmode="email" value="' + esc(f.email) + '">' +
+      '<label>מייל (לאישור ולתזכורת ערב לפני) *</label><input id="f_email" type="email" inputmode="email" autocomplete="email" value="' + esc(f.email) + '">' +
       '<label>אילו רכבים מצלמים?</label><input id="f_car" placeholder="לדוגמה: מרצדס G63 שחורה, ריינג׳ רובר ספורט" value="' + esc(f.car) + '">' +
       '<label>הערות</label><textarea id="f_notes">' + esc(f.notes) + '</textarea>' +
       '<input id="f_website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);opacity:0;pointer-events:none"></div>';
@@ -202,9 +203,10 @@ function pickDate(d) { keepForm(); B.date = d; B.start = null; bookRender(); set
 function pickStart(t) { keepForm(); B.start = t; bookRender(); setTimeout(function () { var el = document.getElementById('f_business'); el && el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 30); }
 function submitBooking() {
   keepForm(); var f = B.form;
-  var miss = ['business', 'contact', 'phone', 'address'].filter(function (k) { return !String(f[k] || '').trim(); });
+  var miss = ['business', 'contact', 'phone', 'address', 'email'].filter(function (k) { return !String(f[k] || '').trim(); });
   if (miss.length) return bookRender('נא למלא את כל השדות שמסומנים בכוכבית');
   if (String(f.phone).replace(/\D/g, '').length < 9) return bookRender('מספר הטלפון לא נראה תקין');
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(String(f.email).trim())) return bookRender('כתובת המייל לא נראית תקינה');
   if (CONF && CONF.turnstileSiteKey && !B.ts) return bookRender('רגע, מסיימים אימות אבטחה קצר. נסו שוב בעוד שנייה');
   var btn = document.getElementById('go'); btn.disabled = true; btn.textContent = 'קובעים...';
   call('book', Object.assign({ date: B.date, start: B.start, idToken: B.session ? '' : (B.idToken || ''), session: B.session || '', turnstile: B.ts || '' }, f)).then(function (r) {
@@ -212,7 +214,7 @@ function submitBooking() {
     var gcal = 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent('צילום עם APEX') +
       '&dates=' + r.date.replace(/-/g, '') + 'T' + r.start.replace(':', '') + '00/' + r.date.replace(/-/g, '') + 'T' + r.end.replace(':', '') + '00&ctz=Asia/Jerusalem&location=' + encodeURIComponent(f.address);
     h('<div class="center"><div class="big-ok">✓</div><h1>הצילום נקבע!</h1><p class="sub">' + esc(r.label) + ' · ' + r.start + ' עד ' + r.end + '<br>' + esc(f.address) + '</p>' +
-      '<a class="btn" href="' + gcal + '" target="_blank" rel="noopener">הוספה ליומן שלי</a> <button class="btn ghost" data-click="loadSlots()">הצילומים שלי</button><p class="muted small" style="margin-top:22px">הצלם שלנו יקבל עכשיו את כל הפרטים. אם צריך לשנות משהו, דברו איתנו.</p></div>');
+      '<a class="btn" href="' + gcal + '" target="_blank" rel="noopener">הוספה ליומן שלי</a> <button class="btn ghost" data-click="loadSlots()">הצילומים שלי</button><p class="muted small" style="margin-top:22px">שלחנו אישור למייל. ערב לפני הצילום, בסביבות 19:00, תגיע תזכורת. אם צריך לבטל, אפשר דרך "הצילומים שלי".</p></div>');
     store('apex_client', { business: f.business, contact: f.contact, phone: f.phone, email: f.email, address: f.address, car: f.car });
     if (r.id && r.tok) addRef(r.id, r.tok);
     B.form = null; loadMine();
@@ -250,21 +252,30 @@ function teamNames() {
   loading();
   call('teamList').then(function (list) {
     h('<h1>זמינות צלמים</h1><p class="sub">מי אתה?</p><div class="names">' + list.map(function (p) {
-      return '<button class="chip" data-click="teamPin(\'' + p.id + '\',\'' + esc(p.name).replace(/'/g, '') + '\')"><b>' + esc(p.name) + '</b></button>';
+      return '<button class="chip" data-click="teamPin(\'' + esc(p.id) + '\',\'' + esc(String(p.name).replace(/['\\]/g, '')) + '\')"><b>' + esc(p.name) + '</b></button>';
     }).join('') + '</div>' + (CONF && CONF.googleClientId ? '<button class="btn ghost sm" style="margin-top:18px" data-click="teamWelcome()">חזרה להתחברות עם Google</button>' : ''));
   }).catch(fail);
 }
 function teamPin(id, name, err) {
   AUTH.id = id;
-  h('<h1>היי ' + esc(name) + '</h1><p class="sub">הכנס את הקוד האישי שלך (4 ספרות)</p><div class="card"><input id="pin" class="pin" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" autocorrect="off" spellcheck="false" name="apx-code-' + Date.now() + '" data-lpignore="true" data-1p-ignore="true"></div>' +
+  h('<h1>היי ' + esc(name) + '</h1><p class="sub">הכנס את הקוד האישי שלך</p><div class="card"><input id="pin" class="pin" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="off" autocorrect="off" spellcheck="false" name="apx-code-' + Date.now() + '" data-lpignore="true" data-1p-ignore="true">' +
+    '<button class="btn" id="pin_go" style="width:100%;margin-top:12px" disabled>כניסה</button></div>' +
     (err ? '<div class="err">' + esc(err) + '</div>' : '') + '<button class="btn ghost sm" data-click="teamNames()">זה לא אני</button>');
-  var el = document.getElementById('pin'), busy = false; el.focus();
+  var el = document.getElementById('pin'), go = document.getElementById('pin_go'), busy = false, typed = false; el.focus();
+  function send() {
+    if (busy || !typed || el.value.length < 4) return;
+    busy = true; AUTH.pin = el.value; loading();
+    call('teamLogin').then(function (d) { if (d.session) { store('apex_team_s', d.session); AUTH = { session: d.session }; } teamLoaded(d); }).catch(function (e2) { teamPin(id, name, e2.message); });
+  }
   el.oninput = function (e) {
-    el.value = el.value.replace(/\D/g, '').slice(0, 4);
+    el.value = el.value.replace(/\D/g, '').slice(0, 6);
     // only real typing logs in; ignore password-manager autofill (no inputType / replacement text)
-    if (!e || !e.inputType || e.inputType === 'insertReplacementText') return;
-    if (el.value.length === 4 && !busy) { busy = true; AUTH.pin = el.value; loading(); call('teamLogin').then(function (d) { if (d.session) { store('apex_team_s', d.session); AUTH = { session: d.session }; } teamLoaded(d); }).catch(function (e2) { teamPin(id, name, e2.message); }); }
+    typed = !!(e && e.inputType && e.inputType !== 'insertReplacementText');
+    go.disabled = !typed || el.value.length < 4;
+    if (typed && el.value.length === 6) send();
   };
+  el.onkeydown = function (e) { if (e.key === 'Enter') send(); };
+  go.onclick = send;
 }
 function teamLoaded(d, adminPid) {
   T = d; T.days = {}; T.adminPid = adminPid || null;
@@ -405,7 +416,7 @@ function adminShoots() {
 function adminAvail() {
   var d = A.d, team = d.team.filter(function (t) { return t.active !== 'לא'; });
   var av = {}, bk = {};
-  d.avail.forEach(function (a) { (av[a.photographerId + a.date] = av[a.photographerId + a.date] || []).push(a.from + ' עד ' + a.to); });
+  d.avail.forEach(function (a) { (av[a.photographerId + a.date] = av[a.photographerId + a.date] || []).push(esc(a.from) + ' עד ' + esc(a.to)); });
   d.bookings.forEach(function (b) { if (b.status === 'פעיל') (bk[b.photographerId + b.date] = bk[b.photographerId + b.date] || []).push(b.start + ' ' + b.business); });
   var html = '<div class="card scroll" style="padding:6px 10px"><table class="av"><tr><th>יום</th>' + team.map(function (t) { return '<th>' + esc(t.name) + '</th>'; }).join('') + '</tr>';
   for (var i = 0; i < 28; i++) {
@@ -433,7 +444,7 @@ function adminNewBook() {
     '<label>שם העסק *</label><input id="nb_business">' +
     '<div class="two"><div><label>איש קשר *</label><input id="nb_contact"></div><div><label>טלפון *</label><input id="nb_phone" type="tel"></div></div>' +
     '<label>כתובת הצילום *</label><input id="nb_address">' +
-    '<div class="two"><div><label>מייל הלקוח (לאישור)</label><input id="nb_email" type="email"></div><div><label>רכבים</label><input id="nb_car"></div></div>' +
+    '<div class="two"><div><label>מייל הלקוח (לאישור ולתזכורת)</label><input id="nb_email" type="email"></div><div><label>רכבים</label><input id="nb_car"></div></div>' +
     '<label>הערות</label><textarea id="nb_notes"></textarea>' +
     '<div class="row" style="margin-top:14px"><button class="btn" data-click="adminDoBook()">קביעת הצילום</button></div></div>';
 }
@@ -452,7 +463,7 @@ function adminTeam() {
 }
 function personForm(t) {
   var id = t.id || 'new';
-  return '<div class="card"><div class="two"><div><label style="margin-top:0">שם</label><input id="n_' + id + '" value="' + esc(t.name) + '"></div><div><label style="margin-top:0">קוד אישי (4 ספרות)</label><input id="c_' + id + '" inputmode="numeric" maxlength="4" value="' + esc(t.pin) + '"></div></div>' +
+  return '<div class="card"><div class="two"><div><label style="margin-top:0">שם</label><input id="n_' + id + '" value="' + esc(t.name) + '"></div><div><label style="margin-top:0">קוד אישי (4 עד 6 ספרות)</label><input id="c_' + id + '" inputmode="numeric" maxlength="6" value="' + esc(t.pin) + '"></div></div>' +
     '<div class="two"><div><label>מייל (לשם נשלחות ההתראות)</label><input id="e_' + id + '" type="email" value="' + esc(t.email) + '"></div><div><label>טלפון</label><input id="p_' + id + '" type="tel" value="' + esc(t.phone) + '"></div></div>' +
     '<div class="row" style="margin-top:12px;justify-content:space-between">' + (t.id ? '<label style="margin:0;display:flex;gap:8px;align-items:center;color:var(--txt)"><input id="a_' + id + '" type="checkbox" style="width:auto"' + (t.active !== 'לא' ? ' checked' : '') + '> פעיל</label>' : '<span></span>') +
     '<button class="btn sm" data-click="savePerson(\'' + id + '\')">' + (t.id ? 'שמירה' : 'הוספה') + '</button></div></div>';
@@ -478,7 +489,7 @@ function savePerson(id) {
 }
 function changePw() {
   call('adminPassword', { current: document.getElementById('pw_cur').value, next: document.getElementById('pw_new').value })
-    .then(function () { adminRender('הסיסמה הוחלפה'); window.scrollTo(0, 0); }).catch(function (e) { alertBox(e.message); });
+    .then(function (r) { if (r && r.token) { sstore('apex_adm', r.token); AUTH = { token: r.token }; } adminRender('הסיסמה הוחלפה. כל שאר החיבורים נותקו'); window.scrollTo(0, 0); }).catch(function (e) { alertBox(e.message); });
 }
 function saveConf() { var p = {}; ['durationHours', 'bufferMinutes', 'leadDays', 'horizonDays'].forEach(function (k) { p[k] = document.getElementById('k_' + k).value.trim(); }); adminCall('saveConf', p, 'ההגדרות נשמרו'); }
 
@@ -493,7 +504,7 @@ var ACTS = { pickDate: pickDate, pickStart: pickStart, submitBooking: submitBook
   cancelShoot: cancelShoot, forgetClient: forgetClient, openCancel: openCancel, doClientCancel: doClientCancel, loadSlots: loadSlots,
   teamOpenCancel: teamOpenCancel, doTeamCancel: doTeamCancel, clientLogout: clientLogout, clientGuest: clientGuest, teamWelcome: teamWelcome, adminEditAvail: adminEditAvail, adminBack: adminBack, adminDoBook: adminDoBook, savePerson: savePerson, saveConf: saveConf, changePw: changePw, adminLogout: adminLogout, reloadPage: reloadPage, adminDoLogin: adminDoLogin };
 function runAct(el, code) {
-  var m = /^(\w+)\(([\s\S]*)\)$/.exec(code || ''); if (!m || !ACTS[m[1]]) return;
+  var m = /^(\w+)\(([\s\S]*)\)$/.exec(code || ''); if (!m || !Object.prototype.hasOwnProperty.call(ACTS, m[1])) return;
   var args = [], re = /'((?:[^'\\]|\\.)*)'|(this\.value)|(this)/g, x;
   while ((x = re.exec(m[2]))) args.push(x[1] !== undefined ? x[1].replace(/\\(.)/g, '$1') : x[2] ? el.value : el);
   ACTS[m[1]].apply(null, args);
