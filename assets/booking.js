@@ -15,6 +15,36 @@ function call(action, payload) {
       throw new Error(msg);
     });
 }
+var CONF = null, gsiReady = null, tsReady = null;
+function getConf() { return CONF ? Promise.resolve(CONF) : call('config').then(function (c) { CONF = c; return c; }); }
+function loadScript(src) { return new Promise(function (res, rej) { var s = document.createElement('script'); s.src = src; s.async = true; s.onload = res; s.onerror = rej; document.head.appendChild(s); }); }
+/* Sign in with Google: renders the official button into el, calls cb(idToken) */
+function gButton(el, cb) {
+  if (!el) return;
+  getConf().then(function (c) {
+    if (!c.googleClientId) return;
+    gsiReady = gsiReady || loadScript('https://accounts.google.com/gsi/client');
+    return gsiReady.then(function () {
+      google.accounts.id.initialize({ client_id: c.googleClientId, callback: function (r) { cb(r.credential); }, ux_mode: 'popup', auto_select: false });
+      el.innerHTML = ''; el.classList.remove('hide');
+      google.accounts.id.renderButton(el, { theme: 'filled_black', size: 'large', text: 'continue_with', shape: 'rectangular', locale: 'he', width: 280 });
+    });
+  }).catch(function () {});
+}
+/* Cloudflare Turnstile bot check on the client form */
+function tsRender(el) {
+  if (!el || el.getAttribute('data-done')) return;
+  getConf().then(function (c) {
+    if (!c.turnstileSiteKey) return;
+    el.setAttribute('data-done', '1');
+    tsReady = tsReady || loadScript('https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit');
+    return tsReady.then(function () {
+      B.ts = ''; B.tsId = turnstile.render(el, { sitekey: c.turnstileSiteKey, theme: 'dark', language: 'he',
+        callback: function (t) { B.ts = t; }, 'expired-callback': function () { B.ts = ''; }, 'error-callback': function () { B.ts = ''; } });
+    });
+  }).catch(function () {});
+}
+function tsReset() { try { if (window.turnstile && B.tsId !== undefined) { turnstile.reset(B.tsId); B.ts = ''; } } catch (e) {} }
 function sstore(k, v) { try { if (v === undefined) return sessionStorage.getItem(k); if (v === null) sessionStorage.removeItem(k); else sessionStorage.setItem(k, v); } catch (e) { return null; } }
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
 function h(html) { $app.innerHTML = html; }
@@ -38,6 +68,11 @@ function fail(e) { h('<div class="err">' + esc(e.message) + '</div><button class
 /* ═════════════════════ CLIENT ═════════════════════ */
 var B = { slots: [], date: null, start: null, conf: {} };
 function bookInit() {
+  if (!document.getElementById('bk-top')) {
+    var top = document.createElement('div'); top.id = 'bk-top'; $app.parentNode.insertBefore(top, $app);
+    var ts = document.createElement('div'); ts.id = 'bk-ts'; ts.className = 'hide'; ts.style.margin = '6px 0 20px'; $app.parentNode.insertBefore(ts, $app.nextSibling);
+  }
+  clientTop();
   loading();
   call('bookData').then(function (d) { B.slots = d.slots; B.conf = d.conf; B.date = null; B.start = null; bookRender(); }).catch(fail);
 }
@@ -69,10 +104,36 @@ function bookRender(errMsg) {
       '<label>הערות</label><textarea id="f_notes">' + esc(f.notes) + '</textarea>' +
       '<input id="f_website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);opacity:0;pointer-events:none"></div>';
     if (errMsg) html += '<div class="err">' + esc(errMsg) + '</div>';
+    var tsEl = document.getElementById('bk-ts'); if (tsEl) { tsEl.classList.remove('hide'); tsRender(tsEl); }
     bar('<button class="btn" id="go" data-click="submitBooking()">קביעת הצילום ל' + 'יום ' + DAYS[dow(B.date)] + ' ' + dm(B.date) + ' ב ' + B.start + '</button>');
-  } else bar('');
+  } else { bar(''); var tsEl2 = document.getElementById('bk-ts'); if (tsEl2) tsEl2.classList.add('hide'); }
   h(html);
 }
+function clientTop() {
+  var top = document.getElementById('bk-top'); if (!top) return;
+  getConf().then(function (c) {
+    if (!c.googleClientId) { top.innerHTML = ''; return; }
+    if (B.user) {
+      top.innerHTML = '<div class="card row" style="justify-content:space-between"><span>מחוברים בתור <b>' + esc(B.user.email) + '</b></span><button class="btn ghost sm" data-click="clientLogout()">התנתקות</button></div>';
+    } else {
+      top.innerHTML = '<div class="card"><p class="muted small" style="margin:0 0 10px">התחברו עם Google והפרטים שלכם יישמרו לפעם הבאה. לא חובה.</p><div id="gcl"></div></div>';
+      gButton(document.getElementById('gcl'), clientGoogle);
+    }
+  });
+}
+function clientGoogle(cred) {
+  call('clientLogin', { idToken: cred }).then(function (r) {
+    B.idToken = cred; B.user = { email: r.email, name: r.name };
+    keepForm();
+    var f = B.form || {}, pr = r.profile || {};
+    ['business', 'contact', 'phone', 'address', 'car'].forEach(function (k) { if (!f[k] && pr[k]) f[k] = pr[k]; });
+    if (!f.contact && r.name) f.contact = r.name;
+    if (!f.email) f.email = r.email;
+    B.form = f; B.remembered = !!r.profile;
+    clientTop(); if (B.slots.length) bookRender();
+  }).catch(function (e) { alertBox(e.message); });
+}
+function clientLogout() { B.user = null; B.idToken = null; try { google.accounts.id.disableAutoSelect(); } catch (e) {} clientTop(); }
 function keepForm() { if (!document.getElementById('f_business')) return; B.form = {}; ['business', 'contact', 'phone', 'address', 'email', 'car', 'notes', 'website'].forEach(function (k) { B.form[k] = document.getElementById('f_' + k).value; }); }
 function pickDate(d) { keepForm(); B.date = d; B.start = null; bookRender(); setTimeout(function () { window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); }, 30); }
 function pickStart(t) { keepForm(); B.start = t; bookRender(); setTimeout(function () { var el = document.getElementById('f_business'); el && el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 30); }
@@ -81,9 +142,10 @@ function submitBooking() {
   var miss = ['business', 'contact', 'phone', 'address'].filter(function (k) { return !String(f[k] || '').trim(); });
   if (miss.length) return bookRender('נא למלא את כל השדות שמסומנים בכוכבית');
   if (String(f.phone).replace(/\D/g, '').length < 9) return bookRender('מספר הטלפון לא נראה תקין');
+  if (CONF && CONF.turnstileSiteKey && !B.ts) return bookRender('רגע, מסיימים אימות אבטחה קצר. נסו שוב בעוד שנייה');
   var btn = document.getElementById('go'); btn.disabled = true; btn.textContent = 'קובעים...';
-  call('book', Object.assign({ date: B.date, start: B.start }, f)).then(function (r) {
-    bar('');
+  call('book', Object.assign({ date: B.date, start: B.start, idToken: B.idToken || '', turnstile: B.ts || '' }, f)).then(function (r) {
+    bar(''); var tsEl = document.getElementById('bk-ts'); if (tsEl) tsEl.classList.add('hide'); tsReset();
     var gcal = 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent('צילום עם APEX') +
       '&dates=' + r.date.replace(/-/g, '') + 'T' + r.start.replace(':', '') + '00/' + r.date.replace(/-/g, '') + 'T' + r.end.replace(':', '') + '00&ctz=Asia/Jerusalem&location=' + encodeURIComponent(f.address);
     h('<div class="center"><div class="big-ok">✓</div><h1>הצילום נקבע!</h1><p class="sub">' + esc(r.label) + ' · ' + r.start + ' עד ' + r.end + '<br>' + esc(f.address) + '</p>' +
@@ -91,6 +153,7 @@ function submitBooking() {
     store('apex_client', { business: f.business, contact: f.contact, phone: f.phone, email: f.email, address: f.address, car: f.car });
     B.form = null;
   }).catch(function (e) {
+    tsReset();
     call('bookData').then(function (d) { B.slots = d.slots; if (!B.slots.some(function (s) { return s.date === B.date && s.starts.indexOf(B.start) >= 0; })) B.start = null; bookRender(e.message); })
       .catch(function () { bookRender(e.message); });
   });
@@ -99,6 +162,8 @@ function submitBooking() {
 /* ═════════════════════ TEAM ═════════════════════ */
 var T = {};
 function teamInit() {
+  var ses = sstore('apex_team_s');
+  if (ses) { AUTH = { session: ses }; loading(); return call('teamLogin').then(teamLoaded).catch(function () { sstore('apex_team_s', null); AUTH = {}; teamNames(); }); }
   var saved = store('apex_team');
   if (saved && saved.id) { AUTH.id = saved.id; AUTH.pin = saved.pin; loading(); return call('teamLogin').then(teamLoaded).catch(function () { store('apex_team', null); teamNames(); }); }
   teamNames();
@@ -108,7 +173,12 @@ function teamNames() {
   call('teamList').then(function (list) {
     h('<h1>זמינות צלמים</h1><p class="sub">מי אתה?</p><div class="names">' + list.map(function (p) {
       return '<button class="chip" data-click="teamPin(\'' + p.id + '\',\'' + esc(p.name).replace(/'/g, '') + '\')"><b>' + esc(p.name) + '</b></button>';
-    }).join('') + '</div>');
+    }).join('') + '</div><div class="card" style="margin-top:22px"><p class="muted small" style="margin:0 0 10px">או התחברות עם חשבון Google שרשום אצל בר</p><div id="gtm"></div></div>');
+    gButton(document.getElementById('gtm'), function (cred) {
+      loading();
+      call('teamGoogle', { idToken: cred }).then(function (d) { AUTH = { session: d.session }; sstore('apex_team_s', d.session); teamLoaded(d); })
+        .catch(function (e) { teamNames(); setTimeout(function () { alertBox(e.message); }, 400); });
+    });
   }).catch(fail);
 }
 function teamPin(id, name, err) {
@@ -183,7 +253,7 @@ function teamSave() {
   call(pid ? 'adminSaveAvail' : 'saveAvail', { days: days, photographerId: pid }).then(function (d) { teamLoaded(d, pid); window.scrollTo(0, y); }).catch(function (e) { b.disabled = false; b.textContent = 'שמירת הזמינות'; alertBox(e.message); });
 }
 function alertBox(m) { var el = document.createElement('div'); el.className = 'err'; el.textContent = m; $app.insertBefore(el, $app.firstChild); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-function teamLogout() { store('apex_team', null); AUTH.id = AUTH.pin = null; teamNames(); }
+function teamLogout() { store('apex_team', null); sstore('apex_team_s', null); AUTH = {}; teamNames(); }
 function shootCard(s, admin) {
   return '<div class="card shoot"><div class="row" style="justify-content:space-between"><h4>' + esc(s.business) + '</h4><span class="badge">' + esc(s.label) + ' · ' + s.start + ' עד ' + s.end + '</span></div>' +
     '<div class="kv"><div>איש קשר</div><div>' + esc(s.contact) + ' · <a style="color:var(--acc2)" href="tel:' + esc(s.phone) + '">' + esc(s.phone) + '</a></div><div>כתובת</div><div>' + esc(s.address) + '</div>' +
@@ -203,8 +273,13 @@ function adminLogin(err) {
   bar('');
   h('<h1>ניהול צילומים</h1><p class="sub">כניסה מורשית בלבד</p><form class="card" data-submit="adminDoLogin()">' +
     '<label style="margin-top:0" for="apw">סיסמה</label><input id="apw" type="password" autocomplete="current-password">' +
-    '<div class="row" style="margin-top:14px"><button class="btn" id="alg">כניסה</button></div></form>' + (err ? '<div class="err">' + esc(err) + '</div>' : ''));
+    '<div class="row" style="margin-top:14px"><button class="btn" id="alg">כניסה</button></div></form>' + (err ? '<div class="err">' + esc(err) + '</div>' : '') +
+    '<div id="gad" class="hide" style="margin-top:16px"></div>');
   document.getElementById('apw').focus();
+  gButton(document.getElementById('gad'), function (cred) {
+    loading();
+    call('adminGoogle', { idToken: cred }).then(function (r) { sstore('apex_adm', r.token); AUTH = { token: r.token }; adminInit(); }).catch(function (e) { if (e.message) adminLogin(e.message); });
+  });
 }
 function adminDoLogin() {
   var pw = document.getElementById('apw').value, b = document.getElementById('alg'); b.disabled = true; b.textContent = 'בודק...';
@@ -326,7 +401,7 @@ function reloadPage() { location.reload(); }
 /* CSP-safe event delegation: data-click="fn('a', this)" / data-change="fn('a', this.value)" */
 var ACTS = { pickDate: pickDate, pickStart: pickStart, submitBooking: submitBooking, teamPin: teamPin, teamNames: teamNames, teamLogout: teamLogout,
   setDay: setDay, setHour: setHour, weekFill: weekFill, weekClear: weekClear, teamSave: teamSave, copy: copy, setTab: setTab, reassign: reassign,
-  cancelShoot: cancelShoot, forgetClient: forgetClient, adminEditAvail: adminEditAvail, adminBack: adminBack, adminDoBook: adminDoBook, savePerson: savePerson, saveConf: saveConf, changePw: changePw, adminLogout: adminLogout, reloadPage: reloadPage, adminDoLogin: adminDoLogin };
+  cancelShoot: cancelShoot, forgetClient: forgetClient, clientLogout: clientLogout, adminEditAvail: adminEditAvail, adminBack: adminBack, adminDoBook: adminDoBook, savePerson: savePerson, saveConf: saveConf, changePw: changePw, adminLogout: adminLogout, reloadPage: reloadPage, adminDoLogin: adminDoLogin };
 function runAct(el, code) {
   var m = /^(\w+)\(([\s\S]*)\)$/.exec(code || ''); if (!m || !ACTS[m[1]]) return;
   var args = [], re = /'((?:[^'\\]|\\.)*)'|(this\.value)|(this)/g, x;
