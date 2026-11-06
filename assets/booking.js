@@ -179,7 +179,7 @@ function clientTop() {
     if (!c.googleClientId) { top.innerHTML = ''; return; }
     top.innerHTML = B.user
       ? '<div class="card row" style="justify-content:space-between"><span>מחוברים בתור <b>' + esc(B.user.email) + '</b></span><button class="btn ghost sm" data-click="clientLogout()">התנתקות</button></div>'
-      : '<div class="row" style="justify-content:flex-end;margin-bottom:6px"><button class="btn ghost sm" data-click="clientLogout()">התחברות עם Google</button></div>';
+      : '<div class="row" style="justify-content:flex-end;margin-bottom:6px"><button class="btn ghost sm" data-click="clientToGoogle()">התחברות עם Google</button></div>';
   });
 }
 function clientGoogle(cred) {
@@ -191,10 +191,17 @@ function clientGoogle(cred) {
     loadSlots();
   }).catch(function (e) { clientWelcome(); setTimeout(function () { alertBox(e.message); }, 300); });
 }
-/* sign out, or switch from guest to Google: back to the first screen */
+/* sign out: forget this person on this device (login, saved details, saved booking links) and go back to the first screen */
 function clientLogout() {
-  store('apex_client_s', null); B.user = null; B.idToken = null; B.session = null; B.guest = false; B.form = null; B.remembered = false;
+  store('apex_client_s', null); store('apex_client', null); store('apex_my_refs', null);
+  B.user = null; B.idToken = null; B.session = null; B.guest = false; B.form = null; B.remembered = false; B.mine = [];
   try { google.accounts.id.disableAutoSelect(); } catch (e) {}
+  var ts = document.getElementById('bk-ts'); if (ts) ts.classList.add('hide');
+  clientWelcome(); okBox('התנתקת. הפרטים שלך נמחקו מהמכשיר הזה');
+}
+/* a guest who wants to sign in with Google instead: back to the first screen, nothing is deleted */
+function clientToGoogle() {
+  B.guest = false; B.form = null; B.remembered = false;
   var ts = document.getElementById('bk-ts'); if (ts) ts.classList.add('hide');
   clientWelcome();
 }
@@ -292,7 +299,7 @@ function teamRender(msg) {
   var opts = times(T.conf.dayStart, T.conf.dayEnd, 30);
   var html = T.adminPid
     ? '<div class="row" style="justify-content:space-between"><h1>הזמינות של ' + esc(T.me.name) + '</h1><button class="btn ghost sm" data-click="adminBack()">חזרה לניהול</button></div><p class="sub">אתה עורך את הזמינות בשמו. אל תשכח לשמור.</p>'
-    : '<div class="row" style="justify-content:space-between"><h1>היי ' + esc(T.me.name) + '</h1><button class="btn ghost sm" data-click="teamLogout()">יציאה</button></div>' +
+    : '<div class="row" style="justify-content:space-between"><h1>היי ' + esc(T.me.name) + '</h1><button class="btn ghost sm" data-click="teamLogout()">התנתקות</button></div>' +
     '<p class="sub">סמן באילו ימים ושעות אתה פנוי לצילום. לקוחות יוכלו לקבוע רק בזמנים שסימנת. אל תשכח לשמור.</p>';
   if (msg) html += '<div class="okbox">' + esc(msg) + '</div>';
   if (T.shoots.length) {
@@ -352,7 +359,7 @@ function teamSave() {
   call(pid ? 'adminSaveAvail' : 'saveAvail', { days: days, photographerId: pid }).then(function (d) { teamLoaded(d, pid); window.scrollTo(0, y); }).catch(function (e) { b.disabled = false; b.textContent = 'שמירת הזמינות'; alertBox(e.message); });
 }
 function alertBox(m) { var el = document.createElement('div'); el.className = 'err'; el.textContent = m; $app.insertBefore(el, $app.firstChild); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-function teamLogout() { store('apex_team', null); store('apex_team_s', null); AUTH = {}; try { google.accounts.id.disableAutoSelect(); } catch (e) {} teamWelcome(); }
+function teamLogout() { store('apex_team', null); store('apex_team_s', null); AUTH = {}; T = {}; try { google.accounts.id.disableAutoSelect(); } catch (e) {} teamWelcome(); }
 function shootCard(s, admin) {
   return '<div class="card shoot"><div class="row" style="justify-content:space-between"><h4>' + esc(s.business) + '</h4><span class="badge">' + esc(s.label) + ' · ' + s.start + ' עד ' + s.end + '</span></div>' +
     '<div class="kv"><div>איש קשר</div><div>' + esc(s.contact) + ' · <a style="color:var(--acc2)" href="tel:' + esc(s.phone) + '">' + esc(s.phone) + '</a></div><div>כתובת</div><div>' + esc(s.address) + '</div>' +
@@ -386,10 +393,10 @@ function adminDoLogin() {
     .catch(function (e) { adminLogin(e.message); });
   return false;
 }
-function adminLogout() { call('adminLogout').catch(function () {}); sstore('apex_adm', null); AUTH = {}; adminLogin(); }
+function adminLogout() { call('adminLogout').catch(function () {}); sstore('apex_adm', null); AUTH = {}; try { google.accounts.id.disableAutoSelect(); } catch (e) {} adminLogin(); }
 function adminRender(msg) {
   var d = A.d, tabs = [['shoots', 'צילומים'], ['newbook', 'קביעת צילום'], ['avail', 'זמינות'], ['team', 'צלמים'], ['conf', 'הגדרות']];
-  var html = '<div class="row" style="justify-content:space-between"><h1>ניהול צילומים</h1><button class="btn ghost sm" data-click="adminLogout()">יציאה</button></div>' +
+  var html = '<div class="row" style="justify-content:space-between"><h1>ניהול צילומים</h1><button class="btn ghost sm" data-click="adminLogout()">התנתקות</button></div>' +
     '<div class="card"><label style="margin-top:0">קישור לצלמים</label><div class="linkbox"><input readonly value="' + esc(d.links.team) + '"><button class="btn sm" data-click="copy(\'' + d.links.team + '\',this)">העתקה</button><a class="btn sm wa" target="_blank" href="https://wa.me/?text=' + encodeURIComponent('היי, זה הקישור לסימון הזמינות שלך לצילומים של APEX:\n' + d.links.team) + '">שליחה</a></div>' +
     '<label>קישור ללקוחות</label><div class="linkbox"><input readonly value="' + esc(d.links.book) + '"><button class="btn sm" data-click="copy(\'' + d.links.book + '\',this)">העתקה</button><a class="btn sm wa" target="_blank" href="https://wa.me/?text=' + encodeURIComponent('היי, כאן אפשר לבחור יום ושעה לצילום:\n' + d.links.book) + '">שליחה</a></div>' +
     '<p class="muted small" style="margin:10px 0 0">' + (d.freeDays ? 'כרגע יש ' + d.freeDays + ' ימים עם מועדים פנויים ללקוחות' : 'כרגע אין אף מועד פנוי. בקש מהצלמים לסמן זמינות') + '</p></div>';
@@ -502,7 +509,7 @@ function reloadPage() { location.reload(); }
 var ACTS = { pickDate: pickDate, pickStart: pickStart, submitBooking: submitBooking, teamPin: teamPin, teamNames: teamNames, teamLogout: teamLogout,
   setDay: setDay, setHour: setHour, weekFill: weekFill, weekClear: weekClear, teamSave: teamSave, copy: copy, setTab: setTab, reassign: reassign,
   cancelShoot: cancelShoot, forgetClient: forgetClient, openCancel: openCancel, doClientCancel: doClientCancel, loadSlots: loadSlots,
-  teamOpenCancel: teamOpenCancel, doTeamCancel: doTeamCancel, clientLogout: clientLogout, clientGuest: clientGuest, teamWelcome: teamWelcome, adminEditAvail: adminEditAvail, adminBack: adminBack, adminDoBook: adminDoBook, savePerson: savePerson, saveConf: saveConf, changePw: changePw, adminLogout: adminLogout, reloadPage: reloadPage, adminDoLogin: adminDoLogin };
+  teamOpenCancel: teamOpenCancel, doTeamCancel: doTeamCancel, clientLogout: clientLogout, clientToGoogle: clientToGoogle, clientGuest: clientGuest, teamWelcome: teamWelcome, adminEditAvail: adminEditAvail, adminBack: adminBack, adminDoBook: adminDoBook, savePerson: savePerson, saveConf: saveConf, changePw: changePw, adminLogout: adminLogout, reloadPage: reloadPage, adminDoLogin: adminDoLogin };
 function runAct(el, code) {
   var m = /^(\w+)\(([\s\S]*)\)$/.exec(code || ''); if (!m || !Object.prototype.hasOwnProperty.call(ACTS, m[1])) return;
   var args = [], re = /'((?:[^'\\]|\\.)*)'|(this\.value)|(this)/g, x;
