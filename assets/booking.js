@@ -87,7 +87,7 @@ function bookInit() {
   }).catch(fail);
 }
 function loadSlots() {
-  clientTop(); loading();
+  clientTop(); loading(); B.req = false;
   Promise.all([call('bookData'), loadMine()]).then(function (r) { var d = r[0]; B.slots = d.slots; B.conf = d.conf; B.date = null; B.start = null; bookRender(); }).catch(fail);
 }
 /* my upcoming shoots: by Google login and/or booking references saved on this device */
@@ -103,7 +103,11 @@ function mineBlock() {
   return '<h2>הצילומים שלי</h2>' + B.mine.map(function (m) {
     var open = B.cancelOpen === m.id;
     var html = '<div class="card shoot"><div class="row" style="justify-content:space-between"><h4>' + esc(m.business) + '</h4><span class="badge">' + esc(m.label) + ' · ' + m.start + ' עד ' + m.end + '</span></div>' +
+      (m.pending ? '<p style="margin:8px 0 0"><span class="badge amber">ממתין לאישור צלם</span></p>' : '') +
       '<div class="kv"><div>כתובת</div><div>' + esc(m.address) + '</div>' + (m.photographer ? '<div>צלם</div><div>' + esc(m.photographer) + '</div>' : '') + '</div>';
+    if (m.pending) return html + (open
+      ? '<div class="cancelbox"><p style="margin:0 0 10px">לבטל את הבקשה? הצלמים לא יראו אותה יותר.</p><div class="row"><button class="btn sm red" data-click="doClientCancel(\'' + m.id + '\',\'' + m.tok + '\')">ביטול הבקשה</button><button class="btn sm ghost" data-click="openCancel(\'\')">חזרה</button></div></div></div>'
+      : '<div class="row"><button class="btn sm red" data-click="openCancel(\'' + m.id + '\')">ביטול הבקשה</button></div></div>');
     if (!open) return html + '<div class="row"><button class="btn sm red" data-click="openCancel(\'' + m.id + '\')">ביטול הצילום</button></div></div>';
     return html + '<div class="cancelbox"><label style="margin-top:0">סיבת הביטול (לא חובה)</label><textarea id="cx_reason" maxlength="300"></textarea>' +
       (m.waPhotographer ? '<div class="row" style="margin:12px 0"><a class="btn sm wa" target="_blank" rel="noopener" href="' + esc(m.waPhotographer) + '">וואטסאפ לצלם</a></div>' : '') +
@@ -113,13 +117,13 @@ function mineBlock() {
 }
 function openCancel(id) { keepForm(); B.cancelOpen = id; bookRender(); }
 function doClientCancel(id, tok) {
-  var inf = document.getElementById('cx_inf');
-  if (!inf || !inf.checked) return alertBox('כדי לבטל צריך לסמן שעדכנתם את הצלם');
+  var pending = id.charAt(0) === 'r', inf = document.getElementById('cx_inf');
+  if (!pending && (!inf || !inf.checked)) return alertBox('כדי לבטל צריך לסמן שעדכנתם את הצלם');
   var reason = (document.getElementById('cx_reason') || {}).value || '';
   loading();
   call('clientCancel', { id: id, tok: tok, informed: true, reason: reason }).then(function () {
     B.cancelOpen = null; return loadMine().then(function () { return call('bookData'); });
-  }).then(function (d) { B.slots = d.slots; bookRender(); setTimeout(function () { okBox('הצילום בוטל. שלחנו עדכון ל APEX'); }, 50); })
+  }).then(function (d) { B.slots = d.slots; bookRender(); setTimeout(function () { okBox(pending ? 'הבקשה בוטלה' : 'הצילום בוטל. שלחנו עדכון ל APEX'); }, 50); })
     .catch(function (e) { bookRender(); alertBox(e.message); });
 }
 function okBox(m) { var el = document.createElement('div'); el.className = 'okbox'; el.textContent = m; $app.insertBefore(el, $app.firstChild); window.scrollTo({ top: 0, behavior: 'smooth' }); }
@@ -141,38 +145,94 @@ function applyProfile(pr, email, name) {
   B.form = f; B.remembered = !!(pr && pr.business);
 }
 function bookRender(errMsg) {
+  if (B.req) return reqRender(errMsg);
   if (!B.slots.length) {
-    h('<h1>קביעת יום צילום</h1>' + mineBlock() + '<div class="card"><b>כרגע אין מועדים פנויים</b><p class="muted">דברו איתנו ונמצא יחד מועד שמתאים לכם.</p></div>');
-    bar(''); return;
+    h('<h1>קביעת יום צילום</h1>' + mineBlock() + '<div class="card"><b>כרגע אין מועדים פנויים</b><p class="muted">אפשר לבקש תאריך ושעה שנוחים לכם, ונעדכן ברגע שצלם יאשר.</p>' +
+      '<button class="btn" data-click="openReq()">בקשת תאריך</button></div>');
+    bar(''); var t0 = document.getElementById('bk-ts'); if (t0) t0.classList.add('hide'); return;
   }
   var day = B.slots.filter(function (s) { return s.date === B.date; })[0];
   var html = '<h1>קביעת יום צילום</h1>' + mineBlock() + (B.mine && B.mine.length ? '<h2>צילום חדש</h2>' : '') + '<p class="sub">בחרו יום ושעת התחלה שנוחים לכם. יום צילום נמשך כ ' + esc(B.conf.durationHours) + ' שעות.</p>';
   html += '<h2>1. באיזה יום?</h2><div class="grid">' + B.slots.map(function (s) {
     return '<button class="chip' + (s.date === B.date ? ' on' : '') + '" data-click="pickDate(\'' + s.date + '\')"><span>יום ' + DAYS[dow(s.date)] + '</span><b>' + dm(s.date) + '</b></button>';
-  }).join('') + '</div>';
+  }).join('') + '</div><button class="linkbtn" data-click="openReq()">אף תאריך לא מתאים? בקשו תאריך אחר</button>';
   if (day) {
     html += '<h2>2. באיזו שעה מתחילים?</h2><div class="grid">' + day.starts.map(function (t) {
       return '<button class="chip' + (t === B.start ? ' on' : '') + '" data-click="pickStart(\'' + t + '\')"><b>' + t + '</b><span>עד ' + hm(toM(t) + B.conf.durationHours * 60) + '</span></button>';
     }).join('') + '</div>';
   }
   if (day && B.start) {
-    if (!B.form) { var saved = store('apex_client'); B.form = saved || {}; B.remembered = !!saved; }
-    var f = B.form;
-    html += '<h2>3. פרטים לצילום</h2>' + (B.remembered ? '<p class="muted small" style="margin:-4px 0 10px">מילאנו את הפרטים מהפעם הקודמת. <button class="btn ghost sm" data-click="forgetClient()">זה לא אני</button></p>' : '') + '<div class="card">' +
-      '<label>שם העסק *</label><input id="f_business" value="' + esc(f.business) + '">' +
-      '<div class="two"><div><label>איש קשר *</label><input id="f_contact" value="' + esc(f.contact) + '"></div>' +
-      '<div><label>טלפון *</label><input id="f_phone" type="tel" inputmode="tel" value="' + esc(f.phone) + '"></div></div>' +
-      '<label>כתובת הצילום *</label><input id="f_address" placeholder="רחוב, מספר ועיר" value="' + esc(f.address) + '">' +
-      '<label>מייל (לאישור ולתזכורת ערב לפני) *</label><input id="f_email" type="email" inputmode="email" autocomplete="email" value="' + esc(f.email) + '">' +
-      '<label>אילו רכבים מצלמים?</label><input id="f_car" placeholder="לדוגמה: מרצדס G63 שחורה, ריינג׳ רובר ספורט" value="' + esc(f.car) + '">' +
-      '<label>הערות</label><textarea id="f_notes">' + esc(f.notes) + '</textarea>' +
-      '<input id="f_website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);opacity:0;pointer-events:none"></div>';
+    html += '<h2>3. פרטים לצילום</h2>' + detailsForm();
     if (errMsg) html += '<div class="err">' + esc(errMsg) + '</div>';
     var tsEl = document.getElementById('bk-ts'); if (tsEl) { tsEl.classList.remove('hide'); tsRender(tsEl); }
     bar('<button class="btn" id="go" data-click="submitBooking()">קביעת הצילום ל' + 'יום ' + DAYS[dow(B.date)] + ' ' + dm(B.date) + ' ב ' + B.start + '</button>');
   } else { bar(''); var tsEl2 = document.getElementById('bk-ts'); if (tsEl2) tsEl2.classList.add('hide'); }
   h(html);
 }
+/* the client details form, shared by a booking and a date request */
+function detailsForm() {
+  if (!B.form) { var saved = store('apex_client'); B.form = saved || {}; B.remembered = !!saved; }
+  var f = B.form;
+  return (B.remembered ? '<p class="muted small" style="margin:-4px 0 10px">מילאנו את הפרטים מהפעם הקודמת. <button class="btn ghost sm" data-click="forgetClient()">זה לא אני</button></p>' : '') + '<div class="card">' +
+    '<label>שם העסק *</label><input id="f_business" value="' + esc(f.business) + '">' +
+    '<div class="two"><div><label>איש קשר *</label><input id="f_contact" value="' + esc(f.contact) + '"></div>' +
+    '<div><label>טלפון *</label><input id="f_phone" type="tel" inputmode="tel" value="' + esc(f.phone) + '"></div></div>' +
+    '<label>כתובת הצילום *</label><input id="f_address" placeholder="רחוב, מספר ועיר" value="' + esc(f.address) + '">' +
+    '<label>מייל (לאישור ולתזכורת ערב לפני) *</label><input id="f_email" type="email" inputmode="email" autocomplete="email" value="' + esc(f.email) + '">' +
+    '<label>אילו רכבים מצלמים?</label><input id="f_car" placeholder="לדוגמה: מרצדס G63 שחורה, ריינג׳ רובר ספורט" value="' + esc(f.car) + '">' +
+    '<label>הערות</label><textarea id="f_notes">' + esc(f.notes) + '</textarea>' +
+    '<input id="f_website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);opacity:0;pointer-events:none"></div>';
+}
+function formProblem(f) {
+  var miss = ['business', 'contact', 'phone', 'address', 'email'].filter(function (k) { return !String(f[k] || '').trim(); });
+  if (miss.length) return 'נא למלא את כל השדות שמסומנים בכוכבית';
+  if (String(f.phone).replace(/\D/g, '').length < 9) return 'מספר הטלפון לא נראה תקין';
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(String(f.email).trim())) return 'כתובת המייל לא נראית תקינה';
+  if (CONF && CONF.turnstileSiteKey && !B.ts) return 'רגע, מסיימים אימות אבטחה קצר. נסו שוב בעוד שנייה';
+  return '';
+}
+
+/* ───── a date nobody marked as free: the client asks, photographers get an email, the first who can takes it */
+function openReq() {
+  keepForm(); B.req = true; B.cancelOpen = null;
+  if (!B.reqDate) B.reqDate = B.date || addDays(todayStr(), Math.max(1, Number(B.conf.leadDays) || 1));
+  if (!B.reqStart) B.reqStart = '09:00';
+  reqRender(); window.scrollTo(0, 0);
+}
+function closeReq() { keepReq(); keepForm(); B.req = false; bookRender(); window.scrollTo(0, 0); }
+function todayStr() { var d = new Date(), p = function (n) { return ('0' + n).slice(-2); }; return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()); }
+function keepReq() { var a = document.getElementById('rq_date'), b = document.getElementById('rq_start'); if (a) B.reqDate = a.value; if (b) B.reqStart = b.value; }
+function reqRender(errMsg) {
+  var dur = Number(B.conf.durationHours) || 7, lead = Math.max(1, Number(B.conf.leadDays) || 1);
+  var min = addDays(todayStr(), lead), max = addDays(todayStr(), 180);
+  var opts = times('06:00', hm(Math.min(24 * 60 - dur * 60, toM('15:00'))), 30).map(function (t) { return '<option value="' + t + '"' + (t === B.reqStart ? ' selected' : '') + '>' + t + ' עד ' + hm(toM(t) + dur * 60) + '</option>'; }).join('');
+  var html = '<h1>בקשת תאריך</h1><p class="sub">בחרו תאריך ושעה שנוחים לכם. נשלח את הבקשה לצלמים שלנו, וברגע שצלם יאשר תקבלו מייל עם כל הפרטים.</p>' +
+    '<div class="card"><div class="two"><div><label style="margin-top:0">תאריך *</label><input id="rq_date" type="date" min="' + min + '" max="' + max + '" value="' + esc(B.reqDate) + '"></div>' +
+    '<div><label style="margin-top:0">שעות *</label><select id="rq_start">' + opts + '</select></div></div></div>' +
+    '<h2>פרטים לצילום</h2>' + detailsForm() + (errMsg ? '<div class="err">' + esc(errMsg) + '</div>' : '') +
+    '<button class="linkbtn" data-click="closeReq()">חזרה למועדים הפנויים</button>';
+  h(html);
+  var tsEl = document.getElementById('bk-ts'); if (tsEl) { tsEl.classList.remove('hide'); tsRender(tsEl); }
+  bar('<button class="btn" id="go" data-click="submitReq()">שליחת הבקשה</button>');
+}
+function submitReq() {
+  keepReq(); keepForm(); var f = B.form;
+  if (!B.reqDate) return reqRender('בחרו תאריך');
+  var dur = Number(B.conf.durationHours) || 7, lead = Math.max(1, Number(B.conf.leadDays) || 1);
+  if (B.reqDate < addDays(todayStr(), lead)) return reqRender('אפשר לבקש תאריך החל מ ' + dm(addDays(todayStr(), lead)));
+  var bad = formProblem(f); if (bad) return reqRender(bad);
+  var btn = document.getElementById('go'); btn.disabled = true; btn.textContent = 'שולחים...';
+  call('requestDate', Object.assign({ date: B.reqDate, start: B.reqStart, idToken: B.session ? '' : (B.idToken || ''), session: B.session || '', turnstile: B.ts || '' }, f)).then(function (r) {
+    bar(''); var tsEl = document.getElementById('bk-ts'); if (tsEl) tsEl.classList.add('hide'); tsReset();
+    h('<div class="center"><div class="big-ok">✓</div><h1>הבקשה נשלחה!</h1><p class="sub">' + esc(r.label) + ' · ' + r.start + ' עד ' + r.end + '<br>' + esc(f.address) + '</p>' +
+      '<p>שלחנו את הבקשה לצלמים שלנו. ברגע שצלם יאשר, נשלח לכם מייל עם כל הפרטים.</p><button class="btn ghost" data-click="backHome()">הצילומים והבקשות שלי</button></div>');
+    store('apex_client', { business: f.business, contact: f.contact, phone: f.phone, email: f.email, address: f.address, car: f.car });
+    if (r.id && r.tok) addRef(r.id, r.tok);
+    B.form = null; B.req = false; B.reqDate = null; loadMine();
+  }).catch(function (e) { tsReset(); reqRender(e.message); });
+}
+function backHome() { B.req = false; loadSlots(); }
+
 function clientTop() {
   var top = document.getElementById('bk-top'); if (!top) return;
   getConf().then(function (c) {
@@ -210,18 +270,14 @@ function pickDate(d) { keepForm(); B.date = d; B.start = null; bookRender(); set
 function pickStart(t) { keepForm(); B.start = t; bookRender(); setTimeout(function () { var el = document.getElementById('f_business'); el && el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 30); }
 function submitBooking() {
   keepForm(); var f = B.form;
-  var miss = ['business', 'contact', 'phone', 'address', 'email'].filter(function (k) { return !String(f[k] || '').trim(); });
-  if (miss.length) return bookRender('נא למלא את כל השדות שמסומנים בכוכבית');
-  if (String(f.phone).replace(/\D/g, '').length < 9) return bookRender('מספר הטלפון לא נראה תקין');
-  if (!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(String(f.email).trim())) return bookRender('כתובת המייל לא נראית תקינה');
-  if (CONF && CONF.turnstileSiteKey && !B.ts) return bookRender('רגע, מסיימים אימות אבטחה קצר. נסו שוב בעוד שנייה');
+  var bad = formProblem(f); if (bad) return bookRender(bad);
   var btn = document.getElementById('go'); btn.disabled = true; btn.textContent = 'קובעים...';
   call('book', Object.assign({ date: B.date, start: B.start, idToken: B.session ? '' : (B.idToken || ''), session: B.session || '', turnstile: B.ts || '' }, f)).then(function (r) {
     bar(''); var tsEl = document.getElementById('bk-ts'); if (tsEl) tsEl.classList.add('hide'); tsReset();
     var gcal = 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent('צילום עם APEX') +
       '&dates=' + r.date.replace(/-/g, '') + 'T' + r.start.replace(':', '') + '00/' + r.date.replace(/-/g, '') + 'T' + r.end.replace(':', '') + '00&ctz=Asia/Jerusalem&location=' + encodeURIComponent(f.address);
     h('<div class="center"><div class="big-ok">✓</div><h1>הצילום נקבע!</h1><p class="sub">' + esc(r.label) + ' · ' + r.start + ' עד ' + r.end + '<br>' + esc(f.address) + '</p>' +
-      '<a class="btn" href="' + gcal + '" target="_blank" rel="noopener">הוספה ליומן שלי</a> <button class="btn ghost" data-click="loadSlots()">הצילומים שלי</button><p class="muted small" style="margin-top:22px">שלחנו אישור למייל. ערב לפני הצילום, בסביבות 19:00, תגיע תזכורת. אם צריך לבטל, אפשר דרך "הצילומים שלי".</p></div>');
+      '<a class="btn" href="' + gcal + '" target="_blank" rel="noopener">הוספה ליומן שלי</a> <button class="btn ghost" data-click="backHome()">הצילומים שלי</button><p class="muted small" style="margin-top:22px">שלחנו אישור למייל. ערב לפני הצילום, בסביבות 19:00, תגיע תזכורת. אם צריך לבטל, אפשר דרך "הצילומים שלי".</p></div>');
     store('apex_client', { business: f.business, contact: f.contact, phone: f.phone, email: f.email, address: f.address, car: f.car });
     if (r.id && r.tok) addRef(r.id, r.tok);
     B.form = null; loadMine();
@@ -285,46 +341,117 @@ function teamPin(id, name, err) {
   go.onclick = send;
 }
 function teamLoaded(d, adminPid) {
-  T = d; T.days = {}; T.adminPid = adminPid || null;
+  var keepMonth = T && T.me && d.me && T.me.id === d.me.id ? T.month : null;
+  T = d; T.days = {}; T.adminPid = adminPid || null; T.sel = {}; T.from = '09:00'; T.to = '17:00';
   d.avail.forEach(function (a) {
     var x = T.days[a.date];
     if (!x) T.days[a.date] = { from: a.from, to: a.to };
     else { if (a.from < x.from) x.from = a.from; if (a.to > x.to) x.to = a.to; }
   });
+  T.month = keepMonth || d.today.slice(0, 7);
   T.dirty = false; teamRender();
+  if (REQ_HASH && !adminPid) {
+    var id = REQ_HASH; REQ_HASH = null;
+    if ((T.requests || []).some(function (r) { return r.id === id; })) {
+      T.hl = id; teamRender();
+      setTimeout(function () { var el = document.getElementById('rq_' + id); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 60);
+    } else alertBox('הבקשה הזאת כבר נלקחה או נסגרה');
+  }
 }
 function isFull(x) { return x && x.from === T.conf.dayStart && x.to === T.conf.dayEnd; }
 function teamRender(msg) {
-  var shootsBy = {}; T.shoots.forEach(function (s) { (shootsBy[s.date] = shootsBy[s.date] || []).push(s); });
-  var opts = times(T.conf.dayStart, T.conf.dayEnd, 30);
   var html = T.adminPid
     ? '<div class="row" style="justify-content:space-between"><h1>הזמינות של ' + esc(T.me.name) + '</h1><button class="btn ghost sm" data-click="adminBack()">חזרה לניהול</button></div><p class="sub">אתה עורך את הזמינות בשמו. אל תשכח לשמור.</p>'
     : '<div class="row" style="justify-content:space-between"><h1>היי ' + esc(T.me.name) + '</h1><button class="btn ghost sm" data-click="teamLogout()">התנתקות</button></div>' +
-    '<p class="sub">סמן באילו ימים ושעות אתה פנוי לצילום. לקוחות יוכלו לקבוע רק בזמנים שסימנת. אל תשכח לשמור.</p>';
+    '<p class="sub">בחר בלוח את הימים שאתה פנוי בהם וסמן שעות. לקוחות יוכלו לקבוע רק בזמנים שסימנת. אל תשכח לשמור.</p>';
   if (msg) html += '<div class="okbox">' + esc(msg) + '</div>';
-  if (T.shoots.length) {
-    html += '<h2>הצילומים שלי</h2>' + T.shoots.map(function (s) { return T.adminPid ? shootCard(s) : teamShootCard(s); }).join('');
-    html += '<h2>הזמינות שלי</h2>';
-  }
-  var start = T.today, end = addDays(T.today, T.horizon);
-  var first = addDays(start, -dow(start)); // week starts on Sunday
-  for (var w = first; w <= end; w = addDays(w, 7)) {
-    html += '<div class="wk"><h3>שבוע ' + dm(w) + ' עד ' + dm(addDays(w, 6)) + '</h3><div class="row"><button class="btn ghost sm" data-click="weekFill(\'' + w + '\')">פנוי כל השבוע</button><button class="btn ghost sm" data-click="weekClear(\'' + w + '\')">נקה</button></div></div><div class="card" style="padding:4px 14px">';
-    for (var i = 0; i < 7; i++) {
-      var d = addDays(w, i); if (d < start || d > end) continue;
-      var x = T.days[d], mode = !x ? 'no' : isFull(x) ? 'full' : 'part';
-      html += '<div class="day"><div class="dl">יום ' + DAYS[dow(d)] + '<span>' + dm(d) + '</span></div>' +
-        '<div class="seg"><button class="' + (mode === 'no' ? 'on' : '') + '" data-click="setDay(\'' + d + '\',\'no\')">לא פנוי</button><button class="' + (mode === 'full' ? 'on' : '') + '" data-click="setDay(\'' + d + '\',\'full\')">כל היום</button><button class="' + (mode === 'part' ? 'on' : '') + '" data-click="setDay(\'' + d + '\',\'part\')">שעות</button></div>';
-      if (mode === 'part') html += '<div class="hours"><select data-change="setHour(\'' + d + '\',\'from\',this.value)">' + opts.map(function (o) { return '<option' + (o === x.from ? ' selected' : '') + '>' + o + '</option>'; }).join('') + '</select> עד ' +
-        '<select data-change="setHour(\'' + d + '\',\'to\',this.value)">' + opts.map(function (o) { return '<option' + (o === x.to ? ' selected' : '') + '>' + o + '</option>'; }).join('') + '</select></div>';
-      (shootsBy[d] || []).forEach(function (s) { html += '<span class="badge">צילום ' + s.start + ' · ' + esc(s.business) + '</span>'; });
-      html += '</div>';
-    }
-    html += '</div>';
-  }
+  if (!T.adminPid && T.requests && T.requests.length) html += '<h2>בקשות פתוחות מלקוחות</h2><p class="muted small" style="margin:-6px 0 10px">לקוחות שביקשו תאריך שעוד לא סומן כפנוי. הראשון שמאשר מקבל את הצילום.</p>' + T.requests.map(reqCard).join('');
+  if (T.shoots.length) html += '<h2>הצילומים שלי</h2>' + T.shoots.map(function (s) { return T.adminPid ? shootCard(s) : teamShootCard(s); }).join('');
+  html += '<h2>הזמינות שלי</h2>' + calendarHtml() + calPanel();
   h(html);
   bar('<button class="btn" id="save" data-click="teamSave()"' + (T.dirty ? '' : ' disabled') + '>' + (T.dirty ? 'שמירת הזמינות' : 'הכל שמור ✓') + '</button>');
 }
+
+/* ───── open client requests: first photographer who can takes it */
+var REQ_HASH = (/[#&]req=(r[0-9a-f]{1,16})/.exec(location.hash) || [])[1] || null;
+if (REQ_HASH) { try { history.replaceState(null, '', location.pathname); } catch (e) {} }
+function reqCard(r) {
+  var html = '<div class="card shoot req' + (T.hl === r.id ? ' hl' : '') + '" id="rq_' + esc(r.id) + '"><div class="row" style="justify-content:space-between"><h4>' + esc(r.business) + '</h4><span class="badge">' + esc(r.label) + ' · ' + r.start + ' עד ' + r.end + '</span></div>' +
+    '<div class="kv"><div>כתובת</div><div>' + esc(r.address) + '</div>' + (r.car ? '<div>רכבים</div><div>' + esc(r.car) + '</div>' : '') + (r.notes ? '<div>הערות</div><div>' + esc(r.notes) + '</div>' : '') + '</div>';
+  if (r.busy) return html + '<p class="muted small" style="margin:0">יש לך כבר צילום באותו זמן</p></div>';
+  if (T.takeOpen === r.id) return html + '<div class="cancelbox"><p style="margin:0 0 10px">לקחת את הצילום ב' + esc(r.label) + ', ' + r.start + ' עד ' + r.end + '? הלקוח יקבל אישור, ואתה תקבל את כל הפרטים שלו.</p>' +
+    '<div class="row"><button class="btn sm" data-click="doTake(\'' + esc(r.id) + '\')">כן, הצילום שלי</button><button class="btn sm ghost" data-click="openTake(\'\')">חזרה</button></div></div></div>';
+  return html + '<div class="row"><button class="btn sm" data-click="openTake(\'' + esc(r.id) + '\')">אני יכול לצלם</button></div></div>';
+}
+function openTake(id) { T.takeOpen = id; var y = window.scrollY; teamRender(); window.scrollTo(0, y); }
+function doTake(id) {
+  if (T.dirty && !confirm('יש שינויים בזמינות שלא נשמרו. להמשיך בלי לשמור אותם?')) return;
+  loading();
+  call('teamTake', { id: id }).then(function (d) { teamLoaded(d); setTimeout(function () { okBox('הצילום שלך! כל הפרטים ב"הצילומים שלי" ונשלחו גם למייל'); }, 50); })
+    .catch(function (e) { call('teamLogin').then(function (d) { teamLoaded(d); alertBox(e.message); }).catch(function () { teamRender(); alertBox(e.message); }); });
+}
+
+/* ───── availability calendar: tap days, pick hours, apply */
+var WD = ['א׳', 'ב׳', 'ג׳', 'ד׳', 'ה׳', 'ו׳', 'ש׳'];
+var MONTHS = ['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'];
+function monthDays(ym) { var p = ym.split('-').map(Number), n = new Date(Date.UTC(p[0], p[1], 0)).getUTCDate(), out = []; for (var i = 1; i <= n; i++) out.push(ym + '-' + ('0' + i).slice(-2)); return out; }
+function shiftMonth(ym, k) { var p = ym.split('-').map(Number); return new Date(Date.UTC(p[0], p[1] - 1 + k, 1)).toISOString().slice(0, 7); }
+function shortT(t) { var p = t.split(':'); return Number(p[0]) + (p[1] !== '00' ? ':' + p[1] : ''); }
+function lastDay() { return addDays(T.today, T.horizon); }
+function inRange(d) { return d >= T.today && d <= lastDay(); }
+function calendarHtml() {
+  var ym = T.month, days = monthDays(ym), p = ym.split('-').map(Number);
+  var shootsBy = {}; T.shoots.forEach(function (s) { shootsBy[s.date] = 1; });
+  var canPrev = ym > T.today.slice(0, 7), canNext = ym < lastDay().slice(0, 7);
+  var html = '<div class="card cal"><div class="calhd"><button class="btn ghost sm" aria-label="החודש הקודם" data-click="calNav(\'-1\')"' + (canPrev ? '' : ' disabled') + '>›</button>' +
+    '<b>' + MONTHS[p[1] - 1] + ' ' + p[0] + '</b><button class="btn ghost sm" aria-label="החודש הבא" data-click="calNav(\'1\')"' + (canNext ? '' : ' disabled') + '>‹</button></div><div class="calgrid">';
+  html += WD.map(function (w, i) { return '<button class="wd" title="כל ימי ' + DAYS[i] + ' בחודש" data-click="calWeekday(\'' + i + '\')">' + w + '</button>'; }).join('');
+  for (var i = 0; i < dow(days[0]); i++) html += '<div class="cd blank"></div>';
+  days.forEach(function (d) {
+    var x = T.days[d], ok = inRange(d);
+    var cls = 'cd' + (ok ? '' : ' off') + (x && ok ? ' av' : '') + (T.sel[d] ? ' sel' : '') + (d === T.today ? ' today' : '');
+    html += '<button class="' + cls + '"' + (ok ? ' data-click="calTap(\'' + d + '\')"' : ' disabled') + '><b>' + Number(d.slice(8)) + '</b>' +
+      (x && ok ? '<small>' + (isFull(x) ? 'כל היום' : shortT(x.from) + ' עד ' + shortT(x.to)) + '</small>' : '') + (shootsBy[d] ? '<i>📸</i>' : '') + '</button>';
+  });
+  return html + '</div><div class="legend"><span class="l-av">פנוי</span><span class="l-sel">נבחר</span><span>📸 יש צילום</span></div></div>';
+}
+function calPanel() {
+  var sel = Object.keys(T.sel).sort(), opts = times(T.conf.dayStart, T.conf.dayEnd, 30);
+  if (!sel.length) return '<div class="card calpanel"><p class="muted" style="margin:0">לחץ על ימים בלוח כדי לבחור אותם, ואז סמן שעות. לחיצה על א׳ עד ש׳ בוחרת את כל הימים האלה בחודש.</p>' +
+    '<div class="row" style="margin-top:12px"><button class="btn ghost sm" data-click="calMonthAll()">בחירת כל החודש חוץ משבת</button></div></div>';
+  var o = function (v) { return opts.map(function (t) { return '<option' + (t === v ? ' selected' : '') + '>' + t + '</option>'; }).join(''); };
+  return '<div class="card calpanel on"><div class="row" style="justify-content:space-between;margin-bottom:10px"><b>' + (sel.length === 1 ? 'נבחר יום ' + DAYS[dow(sel[0])] + ' ' + dm(sel[0]) : 'נבחרו ' + sel.length + ' ימים') + '</b>' +
+    '<button class="btn ghost sm" data-click="calClear()">ניקוי בחירה</button></div>' +
+    '<div class="hours"><span class="muted">משעה</span><select data-change="calHour(\'from\',this.value)">' + o(T.from) + '</select><span class="muted">עד</span><select data-change="calHour(\'to\',this.value)">' + o(T.to) + '</select></div>' +
+    '<div class="row" style="margin-top:12px"><button class="btn sm" data-click="calApply(\'part\')">פנוי בשעות האלה</button><button class="btn sm ghost" data-click="calApply(\'full\')">פנוי כל היום</button><button class="btn sm red" data-click="calApply(\'no\')">לא פנוי</button></div></div>';
+}
+function calRerender() { var y = window.scrollY; teamRender(); window.scrollTo(0, y); }
+function calNav(k) { T.month = shiftMonth(T.month, Number(k)); calRerender(); }
+function calTap(d) {
+  if (T.sel[d]) delete T.sel[d]; else T.sel[d] = 1;
+  var k = Object.keys(T.sel);
+  if (k.length === 1 && T.days[k[0]] && !isFull(T.days[k[0]])) { T.from = T.days[k[0]].from; T.to = T.days[k[0]].to; }
+  calRerender();
+}
+function calWeekday(i) {
+  var list = monthDays(T.month).filter(function (d) { return dow(d) === Number(i) && inRange(d); });
+  var all = list.length && list.every(function (d) { return T.sel[d]; });
+  list.forEach(function (d) { if (all) delete T.sel[d]; else T.sel[d] = 1; });
+  calRerender();
+}
+function calMonthAll() { monthDays(T.month).forEach(function (d) { if (inRange(d) && dow(d) !== 6) T.sel[d] = 1; }); calRerender(); }
+function calClear() { T.sel = {}; calRerender(); }
+function calHour(k, v) { T[k] = v; }
+function calApply(mode) {
+  if (mode === 'part' && toM(T.to) <= toM(T.from)) return alertBox('שעת הסיום צריכה להיות אחרי שעת ההתחלה');
+  Object.keys(T.sel).forEach(function (d) {
+    if (mode === 'no') delete T.days[d];
+    else if (mode === 'full') T.days[d] = { from: T.conf.dayStart, to: T.conf.dayEnd };
+    else T.days[d] = { from: T.from, to: T.to };
+  });
+  T.sel = {}; T.dirty = true; calRerender();
+}
+window.addEventListener('beforeunload', function (e) { if (BOOT.page !== 'book' && T && T.dirty) { e.preventDefault(); e.returnValue = ''; } });
 function teamShootCard(s) {
   if (T.cancelOpen !== s.id) return shootCard(s, '<button class="btn sm red" data-click="teamOpenCancel(\'' + s.id + '\')">ביטול הצילום</button>');
   return shootCard(s) .replace(/<\/div>$/, '') + '<div class="cancelbox"><label style="margin-top:0">סיבת הביטול (לא חובה)</label><textarea id="tx_reason" maxlength="300"></textarea>' +
@@ -340,15 +467,6 @@ function doTeamCancel(id) {
   call('teamCancel', { id: id, informed: true, reason: reason }).then(function (d) { teamLoaded(d); setTimeout(function () { okBox('הצילום בוטל. בר קיבל עדכון'); }, 50); })
     .catch(function (e) { teamRender(); alertBox(e.message); });
 }
-function setDay(d, m) {
-  if (m === 'no') delete T.days[d];
-  else if (m === 'full') T.days[d] = { from: T.conf.dayStart, to: T.conf.dayEnd };
-  else T.days[d] = T.days[d] && !isFull(T.days[d]) ? T.days[d] : { from: '09:00', to: '17:00' };
-  T.dirty = true; var y = window.scrollY; teamRender(); window.scrollTo(0, y);
-}
-function setHour(d, k, v) { T.days[d][k] = v; T.dirty = true; var b = document.getElementById('save'); b.disabled = false; b.textContent = 'שמירת הזמינות'; }
-function weekFill(w) { for (var i = 0; i < 7; i++) { var d = addDays(w, i); if (d >= T.today && dow(d) !== 6) T.days[d] = { from: T.conf.dayStart, to: T.conf.dayEnd }; } T.dirty = true; var y = window.scrollY; teamRender(); window.scrollTo(0, y); }
-function weekClear(w) { for (var i = 0; i < 7; i++) delete T.days[addDays(w, i)]; T.dirty = true; var y = window.scrollY; teamRender(); window.scrollTo(0, y); }
 function teamSave() {
   var bad = Object.keys(T.days).filter(function (d) { return T.days[d].to <= T.days[d].from; });
   if (bad.length) return alertBox('בחלק מהימים שעת הסיום מוקדמת משעת ההתחלה');
@@ -395,7 +513,7 @@ function adminDoLogin() {
 }
 function adminLogout() { call('adminLogout').catch(function () {}); sstore('apex_adm', null); AUTH = {}; try { google.accounts.id.disableAutoSelect(); } catch (e) {} adminLogin(); }
 function adminRender(msg) {
-  var d = A.d, tabs = [['shoots', 'צילומים'], ['newbook', 'קביעת צילום'], ['avail', 'זמינות'], ['team', 'צלמים'], ['conf', 'הגדרות']];
+  var d = A.d, nReq = (d.requests || []).length, tabs = [['shoots', 'צילומים' + (nReq ? ' · ' + nReq + (nReq === 1 ? ' בקשה' : ' בקשות') : '')], ['newbook', 'קביעת צילום'], ['avail', 'זמינות'], ['team', 'צלמים'], ['conf', 'הגדרות']];
   var html = '<div class="row" style="justify-content:space-between"><h1>ניהול צילומים</h1><button class="btn ghost sm" data-click="adminLogout()">התנתקות</button></div>' +
     '<div class="card"><label style="margin-top:0">קישור לצלמים</label><div class="linkbox"><input readonly value="' + esc(d.links.team) + '"><button class="btn sm" data-click="copy(\'' + d.links.team + '\',this)">העתקה</button><a class="btn sm wa" target="_blank" href="https://wa.me/?text=' + encodeURIComponent('היי, זה הקישור לסימון הזמינות שלך לצילומים של APEX:\n' + d.links.team) + '">שליחה</a></div>' +
     '<label>קישור ללקוחות</label><div class="linkbox"><input readonly value="' + esc(d.links.book) + '"><button class="btn sm" data-click="copy(\'' + d.links.book + '\',this)">העתקה</button><a class="btn sm wa" target="_blank" href="https://wa.me/?text=' + encodeURIComponent('היי, כאן אפשר לבחור יום ושעה לצילום:\n' + d.links.book) + '">שליחה</a></div>' +
@@ -405,11 +523,32 @@ function adminRender(msg) {
   html += ({ shoots: adminShoots, newbook: adminNewBook, avail: adminAvail, team: adminTeam, conf: adminConf })[A.tab]();
   h(html); bar('');
 }
+function adminRequests() {
+  var rq = A.d.requests || []; if (!rq.length) return '';
+  var actives = A.d.team.filter(function (t) { return t.active !== 'לא'; });
+  return '<h2>בקשות לתאריך אחר</h2>' + rq.map(function (r) {
+    var free = actives.filter(function (t) { return r.free.indexOf(t.id) >= 0; });
+    var pick = free.length ? '<select id="as_' + esc(r.id) + '" style="width:auto;padding:8px;font-size:14px">' + free.map(function (t) { return '<option value="' + esc(t.id) + '">📸 ' + esc(t.name) + '</option>'; }).join('') + '</select>' +
+      '<button class="btn sm" data-click="assignReq(\'' + esc(r.id) + '\')">שיבוץ</button>' : '<span class="muted small">אין צלם פנוי בשעות האלה</span>';
+    return '<div class="card shoot req"><div class="row" style="justify-content:space-between"><h4>' + esc(r.business) + '</h4><span class="badge">' + esc(r.label) + ' · ' + r.start + ' עד ' + r.end + '</span></div>' +
+      '<p style="margin:8px 0 0"><span class="badge amber">ממתינה לצלם</span></p>' +
+      '<div class="kv"><div>איש קשר</div><div>' + esc(r.contact) + ' · <a style="color:var(--acc2)" href="tel:' + esc(r.phone) + '">' + esc(r.phone) + '</a></div><div>מייל</div><div>' + esc(r.email) + '</div><div>כתובת</div><div>' + esc(r.address) + '</div>' +
+      (r.car ? '<div>רכבים</div><div>' + esc(r.car) + '</div>' : '') + (r.notes ? '<div>הערות</div><div>' + esc(r.notes) + '</div>' : '') + '</div>' +
+      '<div class="row">' + pick + '<a class="btn sm wa" target="_blank" rel="noopener" href="' + esc(r.waClient) + '">וואטסאפ ללקוח</a><button class="btn sm red" data-click="closeReqAdmin(\'' + esc(r.id) + '\')">סגירה</button></div></div>';
+  }).join('') + '<h2>צילומים</h2>';
+}
+function assignReq(id) {
+  var el = document.getElementById('as_' + id); if (!el || !el.value) return;
+  var n = A.d.team.filter(function (t) { return t.id === el.value; })[0];
+  if (!confirm('לשבץ את ' + n.name + '? הוא והלקוח יקבלו אישור')) return;
+  adminCall('adminAssignRequest', { id: id, photographerId: el.value }, 'הבקשה שובצה ל' + n.name);
+}
+function closeReqAdmin(id) { if (!confirm('לסגור את הבקשה? הלקוח יקבל מייל שאין צלם פנוי במועד הזה')) return; adminCall('adminCloseRequest', { id: id, notify: true }, 'הבקשה נסגרה והלקוח עודכן'); }
 function adminShoots() {
   var d = A.d, up = d.bookings.filter(function (b) { return b.status === 'פעיל' && b.date >= d.today; });
   var rest = d.bookings.filter(function (b) { return up.indexOf(b) < 0; }).reverse();
   var actives = d.team.filter(function (t) { return t.active !== 'לא'; });
-  var html = up.length ? '' : '<div class="card muted">אין צילומים קרובים</div>';
+  var html = adminRequests() + (up.length ? '' : '<div class="card muted">אין צילומים קרובים</div>');
   html += up.map(function (b) {
     var sel = '<select style="width:auto;padding:8px;font-size:14px" data-change="reassign(\'' + b.id + '\',this.value)">' + actives.map(function (t) { return '<option value="' + t.id + '"' + (t.id === b.photographerId ? ' selected' : '') + '>📸 ' + esc(t.name) + '</option>'; }).join('') + '</select>';
     return shootCard(b, sel + (b.waPhotographer ? '<a class="btn sm wa" target="_blank" href="' + b.waPhotographer + '">וואטסאפ לצלם</a>' : '') + '<button class="btn sm red" data-click="cancelShoot(\'' + b.id + '\')">ביטול</button>');
@@ -507,7 +646,9 @@ function reloadPage() { location.reload(); }
 
 /* CSP-safe event delegation: data-click="fn('a', this)" / data-change="fn('a', this.value)" */
 var ACTS = { pickDate: pickDate, pickStart: pickStart, submitBooking: submitBooking, teamPin: teamPin, teamNames: teamNames, teamLogout: teamLogout,
-  setDay: setDay, setHour: setHour, weekFill: weekFill, weekClear: weekClear, teamSave: teamSave, copy: copy, setTab: setTab, reassign: reassign,
+  teamSave: teamSave, openReq: openReq, closeReq: closeReq, submitReq: submitReq, backHome: backHome, openTake: openTake, doTake: doTake,
+  calNav: calNav, calTap: calTap, calWeekday: calWeekday, calMonthAll: calMonthAll, calClear: calClear, calHour: calHour, calApply: calApply,
+  assignReq: assignReq, closeReqAdmin: closeReqAdmin, copy: copy, setTab: setTab, reassign: reassign,
   cancelShoot: cancelShoot, forgetClient: forgetClient, openCancel: openCancel, doClientCancel: doClientCancel, loadSlots: loadSlots,
   teamOpenCancel: teamOpenCancel, doTeamCancel: doTeamCancel, clientLogout: clientLogout, clientToGoogle: clientToGoogle, clientGuest: clientGuest, teamWelcome: teamWelcome, adminEditAvail: adminEditAvail, adminBack: adminBack, adminDoBook: adminDoBook, savePerson: savePerson, saveConf: saveConf, changePw: changePw, adminLogout: adminLogout, reloadPage: reloadPage, adminDoLogin: adminDoLogin };
 function runAct(el, code) {
