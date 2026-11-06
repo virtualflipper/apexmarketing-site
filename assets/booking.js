@@ -162,10 +162,9 @@ function submitBooking() {
 /* ═════════════════════ TEAM ═════════════════════ */
 var T = {};
 function teamInit() {
-  var ses = sstore('apex_team_s');
-  if (ses) { AUTH = { session: ses }; loading(); return call('teamLogin').then(teamLoaded).catch(function () { sstore('apex_team_s', null); AUTH = {}; teamNames(); }); }
-  var saved = store('apex_team');
-  if (saved && saved.id) { AUTH.id = saved.id; AUTH.pin = saved.pin; loading(); return call('teamLogin').then(teamLoaded).catch(function () { store('apex_team', null); teamNames(); }); }
+  store('apex_team', null); // old format kept the code on the device
+  var ses = store('apex_team_s');
+  if (ses) { AUTH = { session: ses }; loading(); return call('teamLogin').then(teamLoaded).catch(function () { store('apex_team_s', null); AUTH = {}; teamNames(); }); }
   teamNames();
 }
 function teamNames() {
@@ -176,7 +175,7 @@ function teamNames() {
     }).join('') + '</div><div class="card" style="margin-top:22px"><p class="muted small" style="margin:0 0 10px">או התחברות עם חשבון Google שרשום אצל בר</p><div id="gtm"></div></div>');
     gButton(document.getElementById('gtm'), function (cred) {
       loading();
-      call('teamGoogle', { idToken: cred }).then(function (d) { AUTH = { session: d.session }; sstore('apex_team_s', d.session); teamLoaded(d); })
+      call('teamGoogle', { idToken: cred }).then(function (d) { AUTH = { session: d.session }; store('apex_team_s', d.session); teamLoaded(d); })
         .catch(function (e) { teamNames(); setTimeout(function () { alertBox(e.message); }, 400); });
     });
   }).catch(fail);
@@ -190,7 +189,7 @@ function teamPin(id, name, err) {
     el.value = el.value.replace(/\D/g, '').slice(0, 4);
     // only real typing logs in; ignore password-manager autofill (no inputType / replacement text)
     if (!e || !e.inputType || e.inputType === 'insertReplacementText') return;
-    if (el.value.length === 4 && !busy) { busy = true; AUTH.pin = el.value; loading(); call('teamLogin').then(function (d) { store('apex_team', { id: AUTH.id, pin: AUTH.pin }); teamLoaded(d); }).catch(function (e2) { teamPin(id, name, e2.message); }); }
+    if (el.value.length === 4 && !busy) { busy = true; AUTH.pin = el.value; loading(); call('teamLogin').then(function (d) { if (d.session) { store('apex_team_s', d.session); AUTH = { session: d.session }; } teamLoaded(d); }).catch(function (e2) { teamPin(id, name, e2.message); }); }
   };
 }
 function teamLoaded(d, adminPid) {
@@ -253,7 +252,7 @@ function teamSave() {
   call(pid ? 'adminSaveAvail' : 'saveAvail', { days: days, photographerId: pid }).then(function (d) { teamLoaded(d, pid); window.scrollTo(0, y); }).catch(function (e) { b.disabled = false; b.textContent = 'שמירת הזמינות'; alertBox(e.message); });
 }
 function alertBox(m) { var el = document.createElement('div'); el.className = 'err'; el.textContent = m; $app.insertBefore(el, $app.firstChild); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-function teamLogout() { store('apex_team', null); sstore('apex_team_s', null); AUTH = {}; teamNames(); }
+function teamLogout() { store('apex_team', null); store('apex_team_s', null); AUTH = {}; teamNames(); }
 function shootCard(s, admin) {
   return '<div class="card shoot"><div class="row" style="justify-content:space-between"><h4>' + esc(s.business) + '</h4><span class="badge">' + esc(s.label) + ' · ' + s.start + ' עד ' + s.end + '</span></div>' +
     '<div class="kv"><div>איש קשר</div><div>' + esc(s.contact) + ' · <a style="color:var(--acc2)" href="tel:' + esc(s.phone) + '">' + esc(s.phone) + '</a></div><div>כתובת</div><div>' + esc(s.address) + '</div>' +
