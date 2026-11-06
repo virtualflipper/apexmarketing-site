@@ -113,10 +113,15 @@ function teamNames() {
 }
 function teamPin(id, name, err) {
   AUTH.id = id;
-  h('<h1>היי ' + esc(name) + '</h1><p class="sub">הכנס את הקוד האישי שלך (4 ספרות)</p><div class="card"><input id="pin" class="pin" type="password" inputmode="numeric" maxlength="4" autocomplete="off"></div>' +
+  h('<h1>היי ' + esc(name) + '</h1><p class="sub">הכנס את הקוד האישי שלך (4 ספרות)</p><div class="card"><input id="pin" class="pin" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" autocorrect="off" spellcheck="false" name="apx-code-' + Date.now() + '" data-lpignore="true" data-1p-ignore="true"></div>' +
     (err ? '<div class="err">' + esc(err) + '</div>' : '') + '<button class="btn ghost sm" data-click="teamNames()">זה לא אני</button>');
-  var el = document.getElementById('pin'); el.focus();
-  el.oninput = function () { if (el.value.length === 4) { AUTH.pin = el.value; loading(); call('teamLogin').then(function (d) { store('apex_team', { id: AUTH.id, pin: AUTH.pin }); teamLoaded(d); }).catch(function (e) { teamPin(id, name, e.message); }); } };
+  var el = document.getElementById('pin'), busy = false; el.focus();
+  el.oninput = function (e) {
+    el.value = el.value.replace(/\D/g, '').slice(0, 4);
+    // only real typing logs in; ignore password-manager autofill (no inputType / replacement text)
+    if (!e || !e.inputType || e.inputType === 'insertReplacementText') return;
+    if (el.value.length === 4 && !busy) { busy = true; AUTH.pin = el.value; loading(); call('teamLogin').then(function (d) { store('apex_team', { id: AUTH.id, pin: AUTH.pin }); teamLoaded(d); }).catch(function (e2) { teamPin(id, name, e2.message); }); }
+  };
 }
 function teamLoaded(d, adminPid) {
   T = d; T.days = {}; T.adminPid = adminPid || null;
