@@ -104,7 +104,8 @@ function mineBlock() {
     var open = B.cancelOpen === m.id;
     var html = '<div class="card shoot"><div class="row" style="justify-content:space-between"><h4>' + esc(m.business) + '</h4><span class="badge">' + esc(m.label) + ' · ' + m.start + ' עד ' + m.end + '</span></div>' +
       (m.pending ? '<p style="margin:8px 0 0"><span class="badge amber">ממתין לאישור צלם</span></p>' : '') +
-      '<div class="kv"><div>כתובת</div><div>' + esc(m.address) + '</div>' + (m.photographer ? '<div>צלם</div><div>' + esc(m.photographer) + '</div>' : '') + '</div>';
+      '<div class="kv"><div>כתובת</div><div>' + esc(m.address) + '</div>' + (m.photographer ? '<div>צלם</div><div>' + esc(m.photographer) + '</div>' : '') + '</div>' +
+      filesList(m.files) + ((m.files || []).length < FILE_COUNT ? '<div style="margin:0 0 12px">' + filePicker('mineFiles(\'' + m.id + '\',\'' + m.tok + '\',this)', 'הוספת קבצים לצילום').replace(/<p class="muted small"[^]*$/, '') + '</div>' : '');
     if (m.pending) return html + (open
       ? '<div class="cancelbox"><p style="margin:0 0 10px">לבטל את הבקשה? הצלמים לא יראו אותה יותר.</p><div class="row"><button class="btn sm red" data-click="doClientCancel(\'' + m.id + '\',\'' + m.tok + '\')">ביטול הבקשה</button><button class="btn sm ghost" data-click="openCancel(\'\')">חזרה</button></div></div></div>'
       : '<div class="row"><button class="btn sm red" data-click="openCancel(\'' + m.id + '\')">ביטול הבקשה</button></div></div>');
@@ -181,7 +182,83 @@ function detailsForm() {
     '<label>מייל (לאישור ולתזכורת ערב לפני) *</label><input id="f_email" type="email" inputmode="email" autocomplete="email" value="' + esc(f.email) + '">' +
     '<label>אילו רכבים מצלמים?</label><input id="f_car" placeholder="לדוגמה: מרצדס G63 שחורה, ריינג׳ רובר ספורט" value="' + esc(f.car) + '">' +
     '<label>הערות</label><textarea id="f_notes">' + esc(f.notes) + '</textarea>' +
+    '<label>קבצים (לא חובה)</label><p class="muted small" style="margin:0 0 8px">דף נתונים של הרכב, מפרט, תמונות או לוגו. ככה נגיע ליום הצילום עם קריאייטיב והוקים מוכנים.</p>' +
+    filesList(B.files, 'removeFile') + filePicker('pickFiles(this)') +
     '<input id="f_website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);opacity:0;pointer-events:none"></div>';
+}
+/* ───── client files: picked in the form, uploaded one by one right after the booking (or request) is saved */
+var FILE_EXT = ['pdf', 'jpg', 'jpeg', 'png', 'webp', 'heic', 'heif', 'doc', 'docx', 'xls', 'xlsx', 'csv', 'txt'], FILE_MAX = 10 * 1024 * 1024, FILE_COUNT = 8;
+function fileSize(n) { return n > 1048576 ? (n / 1048576).toFixed(1) + 'MB' : Math.max(1, Math.round(n / 1024)) + 'KB'; }
+function filePicker(handler, label) {
+  return '<label class="btn ghost sm filebtn">📎 ' + (label || 'הוספת קבצים') + '<input type="file" multiple accept=".' + FILE_EXT.join(',.') + '" data-change="' + handler + '"></label>' +
+    '<p class="muted small" style="margin:6px 0 0">PDF, תמונות, Word או Excel · עד 10MB לקובץ · עד ' + FILE_COUNT + ' קבצים</p>';
+}
+function filesList(list, removeFn) {
+  if (!list || !list.length) return '';
+  return '<div class="flist">' + list.map(function (f, i) {
+    var name = f.name, size = f.size ? ' <span class="muted small">' + fileSize(f.size) + '</span>' : '';
+    var inner = f.url ? '<a href="' + esc(f.url) + '" target="_blank" rel="noopener">📎 ' + esc(name) + '</a>' : '<span>📎 ' + esc(name) + '</span>';
+    return '<div>' + inner + size + (removeFn ? '<button class="btn ghost sm" data-click="' + removeFn + '(\'' + i + '\')">הסרה</button>' : '') + '</div>';
+  }).join('') + '</div>';
+}
+/* returns [okFiles, errorText] */
+function checkFiles(files, already) {
+  var ok = [], bad = [];
+  Array.prototype.forEach.call(files, function (f) {
+    var ext = (/\.([a-z0-9]{2,5})$/i.exec(f.name) || [])[1];
+    if (!ext || FILE_EXT.indexOf(ext.toLowerCase()) < 0) bad.push(f.name + ': סוג קובץ לא נתמך');
+    else if (f.size > FILE_MAX) bad.push(f.name + ': גדול מ 10MB');
+    else if (already + ok.length >= FILE_COUNT) bad.push(f.name + ': אפשר עד ' + FILE_COUNT + ' קבצים');
+    else ok.push(f);
+  });
+  return [ok, bad.join(' · ')];
+}
+function formRerender(msg) { var y = window.scrollY; if (B.req) { keepReq(); reqRender(msg); } else bookRender(msg); window.scrollTo(0, y); }
+function pickFiles(el) {
+  keepForm(); B.files = B.files || [];
+  var r = checkFiles(el.files, B.files.length); B.files = B.files.concat(r[0]); el.value = '';
+  formRerender(r[1] ? 'לא צירפנו: ' + r[1] : '');
+}
+function removeFile(i) { keepForm(); B.files.splice(Number(i), 1); formRerender(); }
+function readB64(f) {
+  return new Promise(function (res, rej) { var fr = new FileReader(); fr.onload = function () { res(String(fr.result).split(',')[1] || ''); }; fr.onerror = function () { rej(new Error('לא הצלחנו לקרוא את הקובץ')); }; fr.readAsDataURL(f); });
+}
+/* uploads sequentially; progress(i, n) before each; resolves with the list of failures */
+function uploadFiles(id, tok, files, progress) {
+  var failed = [], done = 0, i = 0;
+  function next() {
+    if (i >= files.length) return done ? call('filesDone', { id: id, tok: tok }).catch(function () {}).then(function () { return failed; }) : Promise.resolve(failed);
+    var f = files[i++]; if (progress) progress(i, files.length, f.name);
+    return readB64(f).then(function (b64) { return call('uploadFile', { id: id, tok: tok, name: f.name, data: b64 }); })
+      .then(function () { done++; }, function (e) { failed.push(f.name + ': ' + (e.message || 'שגיאה')); }).then(next);
+  }
+  return next();
+}
+function uploadProgress(i, n, name) {
+  h('<div class="center"><div class="spin"></div><h2>מעלים קבצים ' + i + ' מתוך ' + n + '</h2><p class="muted">' + esc(name) + '</p><p class="muted small">אל תסגרו את הדף</p></div>');
+}
+/* after a booking or request is saved: upload the picked files, then show the success screen */
+function afterSave(r, done) {
+  var files = (B.files || []).slice(); B.files = [];
+  if (!files.length) return done([]);
+  uploadFiles(r.id, r.tok, files, uploadProgress).then(done);
+}
+function failedNote(failed) {
+  return failed.length ? '<div class="err" style="text-align:right">חלק מהקבצים לא עלו: ' + esc(failed.join(' · ')) + '<br>אפשר להעלות אותם שוב מ"הצילומים שלי".</div>' : '';
+}
+/* add files to an existing booking or request from "my shoots" */
+function mineFiles(id, tok, el) {
+  var m = (B.mine || []).filter(function (x) { return x.id === id; })[0];
+  var r = checkFiles(el.files, m && m.files ? m.files.length : 0); el.value = '';
+  if (!r[0].length) return alertBox(r[1]);
+  keepForm();
+  uploadFiles(id, tok, r[0], uploadProgress).then(function (failed) {
+    return loadMine().then(function () {
+      B.req = false; bookRender();
+      var msg = [r[1]].concat(failed).filter(Boolean).join(' · ');
+      if (msg) alertBox('חלק מהקבצים לא עלו: ' + msg); else okBox('הקבצים עלו. תודה!');
+    });
+  });
 }
 function formProblem(f) {
   var miss = ['business', 'contact', 'phone', 'address', 'email'].filter(function (k) { return !String(f[k] || '').trim(); });
@@ -224,11 +301,13 @@ function submitReq() {
   var btn = document.getElementById('go'); btn.disabled = true; btn.textContent = 'שולחים...';
   call('requestDate', Object.assign({ date: B.reqDate, start: B.reqStart, idToken: B.session ? '' : (B.idToken || ''), session: B.session || '', turnstile: B.ts || '' }, f)).then(function (r) {
     bar(''); var tsEl = document.getElementById('bk-ts'); if (tsEl) tsEl.classList.add('hide'); tsReset();
-    h('<div class="center"><div class="big-ok">✓</div><h1>הבקשה נשלחה!</h1><p class="sub">' + esc(r.label) + ' · ' + r.start + ' עד ' + r.end + '<br>' + esc(f.address) + '</p>' +
-      '<p>שלחנו את הבקשה לצלמים שלנו. ברגע שצלם יאשר, נשלח לכם מייל עם כל הפרטים.</p><button class="btn ghost" data-click="backHome()">הצילומים והבקשות שלי</button></div>');
-    store('apex_client', { business: f.business, contact: f.contact, phone: f.phone, email: f.email, address: f.address, car: f.car });
     if (r.id && r.tok) addRef(r.id, r.tok);
+    afterSave(r, function (failed) {
+    h('<div class="center"><div class="big-ok">✓</div><h1>הבקשה נשלחה!</h1><p class="sub">' + esc(r.label) + ' · ' + r.start + ' עד ' + r.end + '<br>' + esc(f.address) + '</p>' +
+      '<p>שלחנו את הבקשה לצלמים שלנו. ברגע שצלם יאשר, נשלח לכם מייל עם כל הפרטים.</p><button class="btn ghost" data-click="backHome()">הצילומים והבקשות שלי</button>' + failedNote(failed) + '</div>');
+    store('apex_client', { business: f.business, contact: f.contact, phone: f.phone, email: f.email, address: f.address, car: f.car });
     B.form = null; B.req = false; B.reqDate = null; loadMine();
+    });
   }).catch(function (e) { tsReset(); reqRender(e.message); });
 }
 function backHome() { B.req = false; loadSlots(); }
@@ -274,13 +353,15 @@ function submitBooking() {
   var btn = document.getElementById('go'); btn.disabled = true; btn.textContent = 'קובעים...';
   call('book', Object.assign({ date: B.date, start: B.start, idToken: B.session ? '' : (B.idToken || ''), session: B.session || '', turnstile: B.ts || '' }, f)).then(function (r) {
     bar(''); var tsEl = document.getElementById('bk-ts'); if (tsEl) tsEl.classList.add('hide'); tsReset();
+    if (r.id && r.tok) addRef(r.id, r.tok);
+    afterSave(r, function (failed) {
     var gcal = 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent('צילום עם APEX') +
       '&dates=' + r.date.replace(/-/g, '') + 'T' + r.start.replace(':', '') + '00/' + r.date.replace(/-/g, '') + 'T' + r.end.replace(':', '') + '00&ctz=Asia/Jerusalem&location=' + encodeURIComponent(f.address);
     h('<div class="center"><div class="big-ok">✓</div><h1>הצילום נקבע!</h1><p class="sub">' + esc(r.label) + ' · ' + r.start + ' עד ' + r.end + '<br>' + esc(f.address) + '</p>' +
-      '<a class="btn" href="' + gcal + '" target="_blank" rel="noopener">הוספה ליומן שלי</a> <button class="btn ghost" data-click="backHome()">הצילומים שלי</button><p class="muted small" style="margin-top:22px">שלחנו אישור למייל. ערב לפני הצילום, בסביבות 19:00, תגיע תזכורת. אם צריך לבטל, אפשר דרך "הצילומים שלי".</p></div>');
+      '<a class="btn" href="' + gcal + '" target="_blank" rel="noopener">הוספה ליומן שלי</a> <button class="btn ghost" data-click="backHome()">הצילומים שלי</button>' + failedNote(failed) + '<p class="muted small" style="margin-top:22px">שלחנו אישור למייל. ערב לפני הצילום, בסביבות 19:00, תגיע תזכורת. אם צריך לבטל, אפשר דרך "הצילומים שלי".</p></div>');
     store('apex_client', { business: f.business, contact: f.contact, phone: f.phone, email: f.email, address: f.address, car: f.car });
-    if (r.id && r.tok) addRef(r.id, r.tok);
     B.form = null; loadMine();
+    });
   }).catch(function (e) {
     tsReset();
     call('bookData').then(function (d) { B.slots = d.slots; if (!B.slots.some(function (s) { return s.date === B.date && s.starts.indexOf(B.start) >= 0; })) B.start = null; bookRender(e.message); })
@@ -377,7 +458,8 @@ var REQ_HASH = (/[#&]req=(r[0-9a-f]{1,16})/.exec(location.hash) || [])[1] || nul
 if (REQ_HASH) { try { history.replaceState(null, '', location.pathname); } catch (e) {} }
 function reqCard(r) {
   var html = '<div class="card shoot req' + (T.hl === r.id ? ' hl' : '') + '" id="rq_' + esc(r.id) + '"><div class="row" style="justify-content:space-between"><h4>' + esc(r.business) + '</h4><span class="badge">' + esc(r.label) + ' · ' + r.start + ' עד ' + r.end + '</span></div>' +
-    '<div class="kv"><div>כתובת</div><div>' + esc(r.address) + '</div>' + (r.car ? '<div>רכבים</div><div>' + esc(r.car) + '</div>' : '') + (r.notes ? '<div>הערות</div><div>' + esc(r.notes) + '</div>' : '') + '</div>';
+    '<div class="kv"><div>כתובת</div><div>' + esc(r.address) + '</div>' + (r.car ? '<div>רכבים</div><div>' + esc(r.car) + '</div>' : '') + (r.notes ? '<div>הערות</div><div>' + esc(r.notes) + '</div>' : '') +
+    (r.files ? '<div>קבצים</div><div>📎 ' + r.files + ' קבצים מהלקוח, נפתחים אחרי שלוקחים את הצילום</div>' : '') + '</div>';
   if (r.busy) return html + '<p class="muted small" style="margin:0">יש לך כבר צילום באותו זמן</p></div>';
   if (T.takeOpen === r.id) return html + '<div class="cancelbox"><p style="margin:0 0 10px">לקחת את הצילום ב' + esc(r.label) + ', ' + r.start + ' עד ' + r.end + '? הלקוח יקבל אישור, ואתה תקבל את כל הפרטים שלו.</p>' +
     '<div class="row"><button class="btn sm" data-click="doTake(\'' + esc(r.id) + '\')">כן, הצילום שלי</button><button class="btn sm ghost" data-click="openTake(\'\')">חזרה</button></div></div></div>';
@@ -482,6 +564,7 @@ function shootCard(s, admin) {
   return '<div class="card shoot"><div class="row" style="justify-content:space-between"><h4>' + esc(s.business) + '</h4><span class="badge">' + esc(s.label) + ' · ' + s.start + ' עד ' + s.end + '</span></div>' +
     '<div class="kv"><div>איש קשר</div><div>' + esc(s.contact) + ' · <a style="color:var(--acc2)" href="tel:' + esc(s.phone) + '">' + esc(s.phone) + '</a></div><div>כתובת</div><div>' + esc(s.address) + '</div>' +
     (s.car ? '<div>רכבים</div><div>' + esc(s.car) + '</div>' : '') + (s.notes ? '<div>הערות</div><div>' + esc(s.notes) + '</div>' : '') + '</div>' +
+    filesList(s.files) +
     '<div class="row"><a class="btn sm ghost" href="' + esc(s.waze) + '" target="_blank" rel="noopener">Waze</a><a class="btn sm wa" href="' + esc(s.waClient) + '" target="_blank" rel="noopener">וואטסאפ ללקוח</a>' + (admin || '') + '</div></div>';
 }
 
@@ -534,7 +617,7 @@ function adminRequests() {
       '<p style="margin:8px 0 0"><span class="badge amber">ממתינה לצלם</span></p>' +
       '<div class="kv"><div>איש קשר</div><div>' + esc(r.contact) + ' · <a style="color:var(--acc2)" href="tel:' + esc(r.phone) + '">' + esc(r.phone) + '</a></div><div>מייל</div><div>' + esc(r.email) + '</div><div>כתובת</div><div>' + esc(r.address) + '</div>' +
       (r.car ? '<div>רכבים</div><div>' + esc(r.car) + '</div>' : '') + (r.notes ? '<div>הערות</div><div>' + esc(r.notes) + '</div>' : '') + '</div>' +
-      '<div class="row">' + pick + '<a class="btn sm wa" target="_blank" rel="noopener" href="' + esc(r.waClient) + '">וואטסאפ ללקוח</a><button class="btn sm red" data-click="closeReqAdmin(\'' + esc(r.id) + '\')">סגירה</button></div></div>';
+      filesList(r.files) + '<div class="row">' + pick + '<a class="btn sm wa" target="_blank" rel="noopener" href="' + esc(r.waClient) + '">וואטסאפ ללקוח</a><button class="btn sm red" data-click="closeReqAdmin(\'' + esc(r.id) + '\')">סגירה</button></div></div>';
   }).join('') + '<h2>צילומים</h2>';
 }
 function assignReq(id) {
@@ -683,7 +766,7 @@ function reloadPage() { location.reload(); }
 /* CSP-safe event delegation: data-click="fn('a', this)" / data-change="fn('a', this.value)" */
 var ACTS = { pickDate: pickDate, pickStart: pickStart, submitBooking: submitBooking, teamPin: teamPin, teamNames: teamNames, teamLogout: teamLogout,
   teamSave: teamSave, openReq: openReq, closeReq: closeReq, submitReq: submitReq, backHome: backHome, openTake: openTake, doTake: doTake,
-  calNav: calNav, calTap: calTap, calWeekday: calWeekday, calMonthAll: calMonthAll, calClear: calClear, calHour: calHour, calApply: calApply,
+  pickFiles: pickFiles, removeFile: removeFile, mineFiles: mineFiles, calNav: calNav, calTap: calTap, calWeekday: calWeekday, calMonthAll: calMonthAll, calClear: calClear, calHour: calHour, calApply: calApply,
   assignReq: assignReq, closeReqAdmin: closeReqAdmin, aCalNav: aCalNav, aCalDay: aCalDay, copy: copy, setTab: setTab, reassign: reassign,
   cancelShoot: cancelShoot, forgetClient: forgetClient, openCancel: openCancel, doClientCancel: doClientCancel, loadSlots: loadSlots,
   teamOpenCancel: teamOpenCancel, doTeamCancel: doTeamCancel, clientLogout: clientLogout, clientToGoogle: clientToGoogle, clientGuest: clientGuest, teamWelcome: teamWelcome, adminEditAvail: adminEditAvail, adminBack: adminBack, adminDoBook: adminDoBook, savePerson: savePerson, saveConf: saveConf, changePw: changePw, adminLogout: adminLogout, reloadPage: reloadPage, adminDoLogin: adminDoLogin };
