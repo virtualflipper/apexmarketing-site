@@ -109,3 +109,10 @@
 .dlist{display:flex;flex-direction:column;gap:8px;margin-top:10px}
 .dlist>div{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding-bottom:8px;border-bottom:1px solid var(--line)}
 .dlist>div:last-child{border-bottom:0;padding-bottom:0}
+/* client files */
+.filebtn{position:relative;overflow:hidden;cursor:pointer;margin-top:4px}
+.filebtn input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
+.flist{display:flex;flex-direction:column;gap:6px;margin:8px 0 12px}
+.flist>div{display:flex;align-items:center;gap:10px;justify-content:space-between;background:var(--card2);border:1px solid var(--line);border-radius:var(--r);padding:8px 10px;font-size:14px}
+.flist a{color:var(--acc2);word-break:break-all}
+.flist span{word-break:break-all}
