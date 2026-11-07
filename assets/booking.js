@@ -513,7 +513,7 @@ function adminDoLogin() {
 }
 function adminLogout() { call('adminLogout').catch(function () {}); sstore('apex_adm', null); AUTH = {}; try { google.accounts.id.disableAutoSelect(); } catch (e) {} adminLogin(); }
 function adminRender(msg) {
-  var d = A.d, nReq = (d.requests || []).length, tabs = [['shoots', 'צילומים' + (nReq ? ' · ' + nReq + (nReq === 1 ? ' בקשה' : ' בקשות') : '')], ['newbook', 'קביעת צילום'], ['avail', 'זמינות'], ['team', 'צלמים'], ['conf', 'הגדרות']];
+  var d = A.d, nReq = (d.requests || []).length, tabs = [['shoots', 'צילומים' + (nReq ? ' · ' + nReq + (nReq === 1 ? ' בקשה' : ' בקשות') : '')], ['avail', 'לוח ימים'], ['newbook', 'קביעת צילום'], ['team', 'צלמים'], ['conf', 'הגדרות']];
   var html = '<div class="row" style="justify-content:space-between"><h1>ניהול צילומים</h1><button class="btn ghost sm" data-click="adminLogout()">התנתקות</button></div>' +
     '<div class="card"><label style="margin-top:0">קישור לצלמים</label><div class="linkbox"><input readonly value="' + esc(d.links.team) + '"><button class="btn sm" data-click="copy(\'' + d.links.team + '\',this)">העתקה</button><a class="btn sm wa" target="_blank" href="https://wa.me/?text=' + encodeURIComponent('היי, זה הקישור לסימון הזמינות שלך לצילומים של APEX:\n' + d.links.team) + '">שליחה</a></div>' +
     '<label>קישור ללקוחות</label><div class="linkbox"><input readonly value="' + esc(d.links.book) + '"><button class="btn sm" data-click="copy(\'' + d.links.book + '\',this)">העתקה</button><a class="btn sm wa" target="_blank" href="https://wa.me/?text=' + encodeURIComponent('היי, כאן אפשר לבחור יום ושעה לצילום:\n' + d.links.book) + '">שליחה</a></div>' +
@@ -559,24 +559,60 @@ function adminShoots() {
   }).join('');
   return html;
 }
+/* admin calendar: per day, who is free and when, and which clients booked or asked for that day */
+function adminDays() {
+  var d = A.d, names = {}, out = {};
+  d.team.forEach(function (t) { names[t.id] = t.name; });
+  var day = function (k) { return out[k] = out[k] || { av: [], bk: [], rq: [] }; };
+  d.avail.forEach(function (a) { if (names[a.photographerId] && (d.team.filter(function (t) { return t.id === a.photographerId; })[0] || {}).active !== 'לא') day(a.date).av.push({ id: a.photographerId, name: names[a.photographerId], from: a.from, to: a.to }); });
+  d.bookings.forEach(function (x) { if (x.status === 'פעיל') day(x.date).bk.push(x); });
+  (d.requests || []).forEach(function (r) { day(r.date).rq.push(r); });
+  Object.keys(out).forEach(function (k) { out[k].av.sort(function (x, y) { return x.from < y.from ? -1 : 1; }); out[k].bk.sort(function (x, y) { return x.start < y.start ? -1 : 1; }); });
+  return out;
+}
 function adminAvail() {
-  var d = A.d, team = d.team.filter(function (t) { return t.active !== 'לא'; });
-  var av = {}, bk = {};
-  d.avail.forEach(function (a) { (av[a.photographerId + a.date] = av[a.photographerId + a.date] || []).push(esc(a.from) + ' עד ' + esc(a.to)); });
-  d.bookings.forEach(function (b) { if (b.status === 'פעיל') (bk[b.photographerId + b.date] = bk[b.photographerId + b.date] || []).push(b.start + ' ' + b.business); });
-  var html = '<div class="card scroll" style="padding:6px 10px"><table class="av"><tr><th>יום</th>' + team.map(function (t) { return '<th>' + esc(t.name) + '</th>'; }).join('') + '</tr>';
-  for (var i = 0; i < 28; i++) {
-    var day = addDays(d.today, i);
-    html += '<tr><td><b>' + DAYS[dow(day)].slice(0, 3) + '׳</b> ' + dm(day) + '</td>' + team.map(function (t) {
-      var k = t.id + day;
-      return '<td>' + (bk[k] ? bk[k].map(function (x) { return '<span class="badge">📸 ' + esc(x) + '</span>'; }).join(' ') + ' ' : '') + (av[k] ? '<span style="color:var(--ok)">' + av[k].join(', ') + '</span>' : (bk[k] ? '' : '<span class="muted">·</span>')) + '</td>';
-    }).join('') + '</tr>';
-  }
-  html += '</table></div><h2>עריכת זמינות בשם צלם</h2><div class="row">' + team.map(function (t) {
-    return '<button class="btn ghost sm" data-click="adminEditAvail(\'' + t.id + '\')">' + esc(t.name) + '</button>';
+  var d = A.d, days = adminDays(), team = d.team.filter(function (t) { return t.active !== 'לא'; });
+  var first = addDays(d.today, -14).slice(0, 7), last = addDays(d.today, (Number(d.conf.horizonDays) || 60) + 14).slice(0, 7);
+  if (!A.month) A.month = d.today.slice(0, 7);
+  if (!A.day) A.day = d.today;
+  var ym = A.month, md = monthDays(ym), p = ym.split('-').map(Number);
+  var html = '<div class="card cal"><div class="calhd"><button class="btn ghost sm" aria-label="החודש הקודם" data-click="aCalNav(\'-1\')"' + (ym > first ? '' : ' disabled') + '>›</button>' +
+    '<b>' + MONTHS[p[1] - 1] + ' ' + p[0] + '</b><button class="btn ghost sm" aria-label="החודש הבא" data-click="aCalNav(\'1\')"' + (ym < last ? '' : ' disabled') + '>‹</button></div><div class="calgrid">';
+  html += WD.map(function (w) { return '<div class="wd">' + w + '</div>'; }).join('');
+  for (var i = 0; i < dow(md[0]); i++) html += '<div class="cd blank"></div>';
+  md.forEach(function (k) {
+    var x = days[k] || { av: [], bk: [], rq: [] }, past = k < d.today;
+    var cls = 'cd' + (past ? ' past' : '') + (x.av.length && !past ? ' av' : '') + (k === A.day ? ' sel' : '') + (k === d.today ? ' today' : '');
+    html += '<button class="' + cls + '" data-click="aCalDay(\'' + k + '\')"><b>' + Number(k.slice(8)) + '</b>' +
+      (x.av.length && !past ? '<small>' + (x.av.length === 1 ? '1 פנוי' : x.av.length + ' פנויים') + '</small>' : '') +
+      ((x.bk.length || x.rq.length) ? '<small class="ic">' + (x.bk.length ? '📸' + x.bk.length : '') + (x.rq.length ? ' ⏳' + x.rq.length : '') + '</small>' : '') + '</button>';
+  });
+  html += '</div><div class="legend"><span class="l-av">צלמים פנויים</span><span>📸 צילומים שנקבעו</span><span>⏳ בקשות לקוחות</span></div></div>';
+
+  // the selected day
+  var x = days[A.day] || { av: [], bk: [], rq: [] }, freeIds = x.av.map(function (a) { return a.id; });
+  var notMarked = team.filter(function (t) { return freeIds.indexOf(t.id) < 0; }).map(function (t) { return esc(t.name); });
+  html += '<h2 id="aday">יום ' + DAYS[dow(A.day)] + ' ' + dm(A.day) + '</h2>';
+  html += '<div class="card"><b>צלמים שסימנו שהם פנויים</b>' + (x.av.length ? '<div class="dlist">' + x.av.map(function (a) {
+    var full = a.from === (d.conf.dayStart || '07:00') && a.to === (d.conf.dayEnd || '21:00');
+    var busy = x.bk.filter(function (b) { return b.photographerId === a.id; }).map(function (b) { return 'צילום ב ' + esc(b.start); });
+    return '<div><span>📸 ' + esc(a.name) + (busy.length ? ' <span class="badge">' + busy.join(', ') + '</span>' : '') + '</span><span class="muted">' + (full ? 'כל היום' : esc(a.from) + ' עד ' + esc(a.to)) + '</span></div>';
+  }).join('') + '</div>' : '<p class="muted" style="margin:6px 0 0">אף צלם לא סימן את היום הזה</p>') +
+    (notMarked.length && x.av.length ? '<p class="muted small" style="margin:8px 0 0">לא סימנו: ' + notMarked.join(', ') + '</p>' : '') + '</div>';
+  html += '<div class="card"><b>לקוחות שקבעו ביום הזה</b>' + (x.bk.length ? '<div class="dlist">' + x.bk.map(function (b) {
+    return '<div><span><b>' + esc(b.start) + ' עד ' + esc(b.end) + '</b> · ' + esc(b.business) + ' · ' + esc(b.contact) + ' <a style="color:var(--acc2)" href="tel:' + esc(b.phone) + '">' + esc(b.phone) + '</a></span><span class="muted">📸 ' + esc(b.photographer) + '</span></div>';
+  }).join('') + '</div>' : '<p class="muted" style="margin:6px 0 0">אין צילומים ביום הזה</p>') + '</div>';
+  if (x.rq.length) html += '<div class="card req"><b>לקוחות שביקשו את היום הזה</b><div class="dlist">' + x.rq.map(function (r) {
+    return '<div><span><b>' + esc(r.start) + ' עד ' + esc(r.end) + '</b> · ' + esc(r.business) + ' · ' + esc(r.contact) + ' <a style="color:var(--acc2)" href="tel:' + esc(r.phone) + '">' + esc(r.phone) + '</a></span><span class="badge amber">ממתינה לצלם</span></div>';
+  }).join('') + '</div><p class="muted small" style="margin:8px 0 0">שיבוץ או סגירה בלשונית צילומים</p></div>';
+
+  html += '<h2>עריכת זמינות בשם צלם</h2><div class="row">' + team.map(function (t) {
+    return '<button class="btn ghost sm" data-click="adminEditAvail(\'' + esc(t.id) + '\')">' + esc(t.name) + '</button>';
   }).join('') + '</div>';
   return html;
 }
+function aCalNav(k) { A.month = shiftMonth(A.month, Number(k)); var y = window.scrollY; adminRender(); window.scrollTo(0, y); }
+function aCalDay(k) { A.day = k; var y = window.scrollY; adminRender(); window.scrollTo(0, y); var el = document.getElementById('aday'); if (el && el.getBoundingClientRect().top > window.innerHeight - 120) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
 function adminEditAvail(pid) { loading(); call('adminTeamAvail', { photographerId: pid }).then(function (d) { teamLoaded(d, pid); window.scrollTo(0, 0); }).catch(function (e) { if (e.message) { adminRender(); alertBox(e.message); } }); }
 function adminBack() { T = {}; A.tab = 'avail'; adminInit(); }
 function adminNewBook() {
@@ -648,7 +684,7 @@ function reloadPage() { location.reload(); }
 var ACTS = { pickDate: pickDate, pickStart: pickStart, submitBooking: submitBooking, teamPin: teamPin, teamNames: teamNames, teamLogout: teamLogout,
   teamSave: teamSave, openReq: openReq, closeReq: closeReq, submitReq: submitReq, backHome: backHome, openTake: openTake, doTake: doTake,
   calNav: calNav, calTap: calTap, calWeekday: calWeekday, calMonthAll: calMonthAll, calClear: calClear, calHour: calHour, calApply: calApply,
-  assignReq: assignReq, closeReqAdmin: closeReqAdmin, copy: copy, setTab: setTab, reassign: reassign,
+  assignReq: assignReq, closeReqAdmin: closeReqAdmin, aCalNav: aCalNav, aCalDay: aCalDay, copy: copy, setTab: setTab, reassign: reassign,
   cancelShoot: cancelShoot, forgetClient: forgetClient, openCancel: openCancel, doClientCancel: doClientCancel, loadSlots: loadSlots,
   teamOpenCancel: teamOpenCancel, doTeamCancel: doTeamCancel, clientLogout: clientLogout, clientToGoogle: clientToGoogle, clientGuest: clientGuest, teamWelcome: teamWelcome, adminEditAvail: adminEditAvail, adminBack: adminBack, adminDoBook: adminDoBook, savePerson: savePerson, saveConf: saveConf, changePw: changePw, adminLogout: adminLogout, reloadPage: reloadPage, adminDoLogin: adminDoLogin };
 function runAct(el, code) {

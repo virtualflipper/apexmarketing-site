@@ -102,3 +102,10 @@
 .calpanel.on{border-color:var(--acc2)}
 .hours{flex-wrap:wrap}
 @media(max-width:520px){.cd{min-height:54px}.cd small{font-size:9.5px}}
+/* admin day calendar */
+.calgrid div.wd{text-align:center;color:var(--mut);font:700 13px Assistant,Arial;padding:6px 0}
+.cd.past{opacity:.55}
+.cd small.ic{color:var(--txt);font-size:10.5px}
+.dlist{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.dlist>div{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.dlist>div:last-child{border-bottom:0;padding-bottom:0}
