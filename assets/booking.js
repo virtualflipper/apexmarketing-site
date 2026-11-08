@@ -153,13 +153,13 @@ function bookRender(errMsg) {
     bar(''); var t0 = document.getElementById('bk-ts'); if (t0) t0.classList.add('hide'); return;
   }
   var day = B.slots.filter(function (s) { return s.date === B.date; })[0];
-  var html = '<h1>קביעת יום צילום</h1>' + mineBlock() + (B.mine && B.mine.length ? '<h2>צילום חדש</h2>' : '') + '<p class="sub">בחרו יום ושעת התחלה שנוחים לכם. יום צילום נמשך כ ' + esc(B.conf.durationHours) + ' שעות.</p>';
+  var html = '<h1>קביעת יום צילום</h1>' + mineBlock() + (B.mine && B.mine.length ? '<h2>צילום חדש</h2>' : '') + '<p class="sub">בחרו יום ושעת התחלה שנוחים לכם. ליד כל שעה רואים עד מתי הצילום יכול להימשך.</p>';
   html += '<h2>1. באיזה יום?</h2><div class="grid">' + B.slots.map(function (s) {
     return '<button class="chip' + (s.date === B.date ? ' on' : '') + '" data-click="pickDate(\'' + s.date + '\')"><span>יום ' + DAYS[dow(s.date)] + '</span><b>' + dm(s.date) + '</b></button>';
   }).join('') + '</div><button class="linkbtn" data-click="openReq()">אף תאריך לא מתאים? בקשו תאריך אחר</button>';
   if (day) {
     html += '<h2>2. באיזו שעה מתחילים?</h2><div class="grid">' + day.starts.map(function (t) {
-      return '<button class="chip' + (t === B.start ? ' on' : '') + '" data-click="pickStart(\'' + t + '\')"><b>' + t + '</b><span>עד ' + hm(toM(t) + B.conf.durationHours * 60) + '</span></button>';
+      return '<button class="chip' + (t === B.start ? ' on' : '') + '" data-click="pickStart(\'' + t + '\')"><b>' + t + '</b><span>עד ' + ((day.ends && day.ends[t]) || hm(toM(t) + B.conf.durationHours * 60)) + '</span></button>';
     }).join('') + '</div>';
   }
   if (day && B.start) {
