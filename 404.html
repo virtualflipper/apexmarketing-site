@@ -54,8 +54,28 @@
      .ft{max-width:840px;margin:0 auto;padding-inline:var(--gutter);display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
      .ft a{color:var(--muted);text-decoration:none}
      .ft a:hover{color:var(--paper)}
-     @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
-     </style>
+     
+.code{display:flex;align-items:center;justify-content:flex-end;gap:.06em;direction:ltr;max-width:none;margin-bottom:14px;height:.82em}
+.code .d{display:inline-block}
+.tire{width:.74em;height:.74em;display:inline-block;cursor:pointer;animation:rollin 1.4s cubic-bezier(.2,.9,.3,1.15) both;transform-origin:50% 50%}
+.tire svg{width:100%;height:100%;display:block;overflow:visible}
+.tire.out{animation:rollout .9s cubic-bezier(.5,0,.8,.4) forwards}
+@keyframes rollin{0%{transform:translateX(120vw) rotate(1440deg)}75%{transform:translateX(-.06em) rotate(-20deg)}100%{transform:none}}
+@keyframes rollout{to{transform:translateX(-120vw) rotate(-1440deg)}}
+.skid{margin-inline-start:0;height:6px;width:min(420px,70vw);margin:-6px 0 26px;background:repeating-linear-gradient(90deg,#1c2029 0 26px,transparent 26px 34px);border-radius:3px;opacity:0;animation:skid .6s .9s ease-out forwards}
+@keyframes skid{to{opacity:1}}
+.notes{margin-top:26px;border:1px solid var(--line);background:var(--ink-2);padding:16px 18px;max-width:560px}
+.notes .tag{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.2em;color:var(--blue-lt);direction:ltr;display:block;margin-bottom:6px;text-align:right}
+.notes .txt{font-family:var(--f-mono);font-size:14px;color:var(--paper);line-height:1.7}
+.excuse{margin-top:22px;max-width:560px}
+.excuse .q{font-size:17px;color:var(--paper);min-height:1.8em;margin-bottom:4px;transition:opacity .25s}
+.excuse .q.fade{opacity:0}
+.excuse button{margin-top:6px;background:transparent;border:1px dashed #3A4150;color:var(--muted);font-family:var(--f-body);font-size:14px;padding:9px 16px;cursor:pointer;transition:.25s}
+.excuse button:hover{border-color:var(--blue);color:var(--blue-lt)}
+html.theme-light .excuse .q,html.theme-light .notes .txt{color:#141820}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+     .eyebrow{text-align:right}
+</style>
      </head>
      <body>
      <a class="skip" href="#main">דילוג לתוכן הראשי</a>
@@ -66,26 +86,49 @@
                  </div>
                  </header>
                  <main id="main"><div class="wrap">
-                   <p class="eyebrow">ERROR 404</p>
-                     <p class="code">404</p>
-                       <h1>העמוד לא נמצא</h1>
-                         <p>יכול להיות שהכתובת הוקלדה בטעות, שהעמוד הוסר, או שהקישור שהגעתם דרכו כבר לא מעודכן.</p>
-                           <div class="cta">
-                               <a class="btn" href="/">חזרה לדף הבית</a>
-                                   <a class="btn btn-ghost" href="https://wa.me/972524030370" target="_blank" rel="noopener">דברו איתנו</a>
-                                     </div>
-                                       <div class="links">
-                                           <span class="tag">אולי חיפשתם</span>
-                                               <ul>
-                                                     <li><a href="/שיווק-לסוכנויות-רכב">שיווק לסוכנויות רכב</a></li>
-                                                           <li><a href="/שיווק-ליבואני-רכב">שיווק ליבואני רכב</a></li>
-                                                                 <li><a href="/שיווק-לרכבי-יוקרה">שיווק לרכבי יוקרה</a></li>
-                                                                       <li><a href="/שיווק-לעולם-הרכב">הבלוג</a></li>
-                                                                             <li><a href="/אודות">אודות</a></li>
-                                                                                   <li><a href="/בר-שושן">בר שושן</a></li>
-                                                                                       </ul>
-                                                                                         </div>
-                                                                                         </div></main>
+  <p class="eyebrow">ERROR 404 · WRONG TURN</p>
+  <p class="code" aria-label="404"><span class="d">4</span><span class="tire" id="tire" role="button" tabindex="0" aria-label="גלגל"><svg viewBox="-50 -50 100 100" aria-hidden="true">
+<circle r="48" fill="#141820"/><circle r="48" fill="none" stroke="#2A303B" stroke-width="6" stroke-dasharray="7 5"/>
+<circle r="29" fill="none" stroke="var(--blue)" stroke-width="5"/>
+<g stroke="var(--blue)" stroke-width="5" stroke-linecap="round"><line x1="0" y1="-27" x2="0" y2="-9"/><line x1="25.7" y1="-8.3" x2="8.6" y2="-2.8"/><line x1="15.9" y1="21.8" x2="5.3" y2="7.3"/><line x1="-15.9" y1="21.8" x2="-5.3" y2="7.3"/><line x1="-25.7" y1="-8.3" x2="-8.6" y2="-2.8"/></g>
+<circle r="8" fill="var(--blue-lt)"/></svg></span><span class="d">4</span></p>
+  <div class="skid" aria-hidden="true"></div>
+  <h1>לקחתם פנייה לא נכונה</h1>
+  <p>העמוד שחיפשתם לא נמצא. אולי הוא נמכר, אולי הוא בטיפול, ואולי הקישור פשוט נסע בלי מנוע.</p>
+  <div class="excuse" aria-live="polite">
+    <p class="q" id="excuse">העמוד יצא לנסיעת מבחן ועוד לא חזר</p>
+    <button type="button" id="next">תנו לי תירוץ אחר</button>
+  </div>
+  <div class="notes">
+    <span class="tag">CO-DRIVER NOTES</span>
+    <div class="txt">קרסט, 4 ימינה מתהדק, אל תסמכו על הקישור הזה, 100 מטר עד דף הבית</div>
+  </div>
+  <div class="cta">
+    <a class="btn" href="/">חזרה לדף הבית</a>
+    <a class="btn btn-ghost" href="https://wa.me/972524030370" target="_blank" rel="noopener">דברו איתנו</a>
+  </div>
+  <div class="links">
+    <span class="tag">אולי חיפשתם</span>
+    <ul>
+      <li><a href="/חברת-שיווק-לסוכנויות-רכב">שיווק לסוכנויות רכב</a></li>
+      <li><a href="/שיווק-למוסכים">פרסום ושיווק למוסכים</a></li>
+      <li><a href="/שיווק-לרכבי-יוקרה">שיווק לרכבי יוקרה</a></li>
+      <li><a href="/שיווק-ליבואני-רכב">שיווק ליבואני רכב</a></li>
+      <li><a href="/שיווק-דיגיטלי-לעולם-הרכב">שיווק דיגיטלי לעולם הרכב</a></li>
+      <li><a href="/שיווק-לעולם-הרכב">הבלוג</a></li>
+    </ul>
+  </div>
+</div></main>
+<script>
+(function(){
+  var lines=["העמוד יצא לנסיעת מבחן ועוד לא חזר","העמוד נמכר לפני שהספקתם לראות אותו. כמו כל רכב טוב במגרש","חיפשנו אותו בכל המלאי, אפילו מאחורי הטרייד אין","העמוד נכנס לטיפול 10,000. אמרו שעתיים, אז כנראה עד מחר","הנווט אמר שמאלה, הנהג פנה ימינה. עכשיו אנחנו פה","גם ה-GPS טועה לפעמים. אנחנו לא, אבל הקישור הזה כן","העמוד בדרך מהנמל. המכס עוד בודק אותו","ניסינו להתניע אותו. הוא עשה קליק קליק ושתק"];
+  var i=0,q=document.getElementById('excuse');
+  document.getElementById('next').addEventListener('click',function(){q.classList.add('fade');setTimeout(function(){i=(i+1)%lines.length;q.textContent=lines[i];q.classList.remove('fade')},250)});
+  var t=document.getElementById('tire');
+  function spin(){if(t.classList.contains('out'))return;t.classList.add('out');setTimeout(function(){t.classList.remove('out');t.style.animation='none';void t.offsetWidth;t.style.animation=''},950)}
+  t.addEventListener('click',spin);t.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();spin()}});
+})();
+</script>
                                                                                          <footer><div class="ft">
                                                                                            <span>© 2026 APEX MARKETING · כל הזכויות שמורות</span>
                                                                                              <span><a href="/אודות">אודות</a> · <a href="/בר-שושן">בר שושן</a> · <a href="/שיווק-לעולם-הרכב">בלוג</a> · <a href="/terms">תנאי שימוש</a> · <a href="/accessibility">הצהרת נגישות</a> · <a href="/privacy">מדיניות פרטיות</a></span>
